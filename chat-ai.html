@@ -60,55 +60,52 @@
   </div>
 
   <script>
-    const apiKey = "BtzIkyy";
-    const previousMessages = [];
+  const apiKey = "BtzIkyy";
+  const previousMessages = [];
 
-    async function sendMessage() {
-      const userText = document.getElementById('userInput').value.trim();
-      if (!userText) return;
+  async function sendMessage() {
+    const userText = document.getElementById('userInput').value.trim();
+    if (!userText) return;
 
-      // Simpan pesan user ke riwayat
-      previousMessages.push({ role: "user", content: userText });
+    // Simpan pesan user ke riwayat
+    previousMessages.push({ role: "user", content: userText });
 
-      // Tampilkan pesan user di layar
-      document.getElementById('chatOutput').innerHTML += `
-        <div class="message user-message"><p><strong>You:</strong> ${userText}</p></div>
-      `;
+    // Tampilkan pesan user di UI
+    document.getElementById('chatOutput').innerHTML += `
+      <div class="message user-message"><p><strong>You:</strong> ${userText}</p></div>
+    `;
 
-      // Kirim pesan ke API
-      try {
-        const combinedMessages = previousMessages
-          .map(msg => `${msg.role === "user" ? "You" : "AI"}: ${msg.content}`)
-          .join("\n");
+    try {
+      // Kirim hanya pesan terbaru ke API
+      const response = await fetch(
+        `https://api.betabotz.eu.org/api/search/openai-chat?text=${encodeURIComponent(userText)}&apikey=${apiKey}`
+      );
+      const data = await response.json();
 
-        const response = await fetch(
-          `https://api.betabotz.eu.org/api/search/openai-chat?text=${encodeURIComponent(combinedMessages)}&apikey=${apiKey}`
-        );
-        const data = await response.json();
+      if (data.status) {
+        const aiResponse = data.message;
 
-        if (data.status) {
-          const aiResponse = data.message;
+        // Simpan respons AI ke riwayat
+        previousMessages.push({ role: "assistant", content: aiResponse });
 
-          // Simpan respons AI ke riwayat
-          previousMessages.push({ role: "assistant", content: aiResponse });
-
-          // Tampilkan respons AI di layar
-          document.getElementById('chatOutput').innerHTML += `
-            <div class="message ai-message"><p><strong>AI:</strong> ${aiResponse}</p></div>
-          `;
-        } else {
-          throw new Error("Error dari API");
-        }
-      } catch (error) {
+        // Tampilkan respons AI di UI
         document.getElementById('chatOutput').innerHTML += `
-          <div class="message ai-message"><p><strong>AI:</strong> Terjadi kesalahan, silakan coba lagi.</p></div>
+          <div class="message ai-message"><p><strong>AI:</strong> ${aiResponse}</p></div>
         `;
+      } else {
+        throw new Error("Error dari API");
       }
-
-      // Kosongkan input
-      document.getElementById('userInput').value = '';
-      document.getElementById('chatOutput').scrollTop = document.getElementById('chatOutput').scrollHeight;
+    } catch (error) {
+      // Tampilkan pesan kesalahan
+      document.getElementById('chatOutput').innerHTML += `
+        <div class="message ai-message"><p><strong>AI:</strong> Terjadi kesalahan, silakan coba lagi.</p></div>
+      `;
     }
-  </script>
+
+    // Kosongkan input
+    document.getElementById('userInput').value = '';
+    document.getElementById('chatOutput').scrollTop = document.getElementById('chatOutput').scrollHeight;
+  }
+</script>
 </body>
 </html>
