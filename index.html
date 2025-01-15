@@ -54,7 +54,6 @@
       box-shadow: 0 0 1rem 0.1rem rgba(0, 0, 0, 0.25);
       backdrop-filter: blur(1.5rem);
       min-width: 25rem;
-      box-shadow: rgb(37 39 89 / 8%) 0px 8px 8px 0;
       position: relative;
       z-index: 1;
     }
@@ -72,16 +71,12 @@
       border-color: #673146;
     }
 
-    h1,
-    .occupation,
-    .link-boxes a,
-    .location {
+    h1, .occupation, .link-boxes a, .location {
       text-align: center;
       overflow: hidden;
-      border-right: 0.15rem solid #673146;
       white-space: nowrap;
       width: 0;
-      animation: typing 2s steps(20) 1s forwards, blink 0.75s step-end infinite;
+      animation: typing 2s steps(20) 1s forwards;
     }
 
     h1 {
@@ -153,12 +148,6 @@
     @keyframes typing {
       to {
         width: 100%;
-      }
-    }
-
-    @keyframes blink {
-      50% {
-        border-color: transparent;
       }
     }
   </style>
