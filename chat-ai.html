@@ -84,61 +84,87 @@
   </div>
 
   <script>
-    const apiKey = "BtzIkyy";
-    const previousMessages = [];
+  const apiKey = "BtzIkyy";
+  const siputzxApi = "https://api.siputzx.my.id/api/ai/gpt3?prompt=kamu adalah ai yang ceria&content=";
+  const previousMessages = [];
 
-    async function sendMessage() {
-      const userText = document.getElementById('userInput').value;
-      if (!userText) return;
+  async function sendMessage() {
+    const userText = document.getElementById('userInput').value;
+    if (!userText) return;
 
-      // Tambahkan pesan user ke riwayat
-      previousMessages.push({ role: "user", content: userText });
+    // Tambahkan pesan user ke riwayat
+    previousMessages.push({ role: "user", content: userText });
 
-      // Tampilkan pesan user di UI
-      document.getElementById('chatOutput').innerHTML += `
-        <div class="message user-message">
-          <p><strong>You:</strong> ${userText}</p>
-        </div>
-      `;
+    // Tampilkan pesan user di UI
+    document.getElementById('chatOutput').innerHTML += `
+      <div class="message user-message">
+        <p><strong>You:</strong> ${userText}</p>
+      </div>
+    `;
 
-      // Kirim ke API
+    // Coba API pertama
+    try {
+      const response = await fetch(`https://api.betabotz.eu.org/api/search/openai-chat?text=${encodeURIComponent(userText)}&apikey=${apiKey}`);
+      const data = await response.json();
+
+      if (data.status) {
+        const aiResponse = data.message;
+
+        // Tambahkan respons AI ke riwayat
+        previousMessages.push({ role: "assistant", content: aiResponse });
+
+        // Tampilkan respons AI di UI
+        document.getElementById('chatOutput').innerHTML += `
+          <div class="message ai-message">
+            <p><strong>AI:</strong> ${aiResponse}</p>
+          </div>
+        `;
+      } else {
+        throw new Error("Betabotz API Error");
+      }
+    } catch (error) {
+      console.error("Error API Betabotz:", error);
+
+      // Fallback ke API siputzx.my.id
       try {
-        const response = await fetch(`https://api.betabotz.eu.org/api/search/openai-chat?text=${encodeURIComponent(userText)}&apikey=${apiKey}`);
-        const data = await response.json();
+        const fallbackResponse = await fetch(`${siputzxApi}${encodeURIComponent(userText)}`);
+        const fallbackData = await fallbackResponse.json();
 
-        if (data.status) {
-          const aiResponse = data.message;
+        if (fallbackData.data) {
+          const aiFallbackResponse = fallbackData.data;
 
-          // Tambahkan respons AI ke riwayat
-          previousMessages.push({ role: "assistant", content: aiResponse });
+          // Tambahkan respons AI dari fallback ke riwayat
+          previousMessages.push({ role: "assistant", content: aiFallbackResponse });
 
           // Tampilkan respons AI di UI
           document.getElementById('chatOutput').innerHTML += `
             <div class="message ai-message">
-              <p><strong>AI:</strong> ${aiResponse}</p>
+              <p><strong>AI:</strong> ${aiFallbackResponse}</p>
             </div>
           `;
-
-          // Scroll ke bawah
-          document.getElementById('chatOutput').scrollTop = document.getElementById('chatOutput').scrollHeight;
         } else {
-          throw new Error("API Error");
+          throw new Error("Fallback API Error");
         }
-      } catch (error) {
+      } catch (fallbackError) {
+        console.error("Error Fallback API:", fallbackError);
         document.getElementById('chatOutput').innerHTML += `
           <div class="message ai-message">
-            <p><strong>AI:</strong> Terjadi kesalahan, silakan coba lagi.</p>
+            <p><strong>AI:</strong> Terjadi kesalahan pada semua API, silakan coba lagi nanti.</p>
           </div>
         `;
       }
-
-      // Kosongkan input
-      document.getElementById('userInput').value = '';
     }
 
-    window.onload = function() {
-      efekSalju();
-    };
-  </script>
+    // Scroll ke bawah
+    document.getElementById('chatOutput').scrollTop = document.getElementById('chatOutput').scrollHeight;
+
+    // Kosongkan input
+    document.getElementById('userInput').value = '';
+  }
+
+  window.onload = function() {
+    efekSalju();
+  };
+</script>
 </body>
 </html>
