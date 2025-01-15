@@ -83,13 +83,14 @@
       white-space: nowrap;
       overflow: hidden;
       width: 100%;
-      animation: typing 2s steps(20) 1s forwards, blink 0.75s step-end infinite;
+      animation: typing 2s steps(20) 1s forwards, blink 0.75s step-end infinite, fall 3s ease-in-out infinite;
     }
 
     .occupation, .location {
       font-family: "Space Mono", monospace;
       margin-bottom: 0.5rem;
       font-size: 1.5rem;
+      animation: fall 3s ease-in-out infinite;
     }
 
     .link-boxes {
@@ -155,6 +156,18 @@
     @keyframes blink {
       50% {
         border-color: transparent;
+      }
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(-100%);
+      }
+      50% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(100%);
       }
     }
   </style>
