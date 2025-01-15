@@ -94,6 +94,14 @@
       // Tambahkan pesan user ke riwayat
       previousMessages.push({ role: "user", content: userText });
 
+      // Batasi riwayat percakapan menjadi 5 pesan terakhir
+      const recentMessages = previousMessages.slice(-5);
+
+      // Gabungkan riwayat percakapan menjadi satu string
+      const conversation = recentMessages.map(msg => 
+        `${msg.role === "user" ? "You" : "AI"}: ${msg.content}`
+      ).join("\n");
+
       // Tampilkan pesan user di UI
       document.getElementById('chatOutput').innerHTML += `
         <div class="message user-message">
@@ -103,7 +111,7 @@
 
       // Kirim ke API
       try {
-        const response = await fetch(`https://api.betabotz.eu.org/api/search/openai-chat?text=${encodeURIComponent(userText)}&apikey=${apiKey}`);
+        const response = await fetch(`https://api.betabotz.eu.org/api/search/openai-chat?text=${encodeURIComponent(conversation)}&apikey=${apiKey}`);
         const data = await response.json();
 
         if (data.status) {
