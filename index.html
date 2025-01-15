@@ -34,7 +34,6 @@
       background-repeat: no-repeat;
       background-size: cover;
       width: 100%;
-      animation: scrollBgEffect 20s linear infinite; /* Animasi background */
     }
 
     main {
@@ -58,7 +57,6 @@
       box-shadow: rgb(37 39 89 / 8%) 0px 8px 8px 0;
       position: relative;
       z-index: 1;
-      animation: fadeIn 1.5s ease-in-out; /* Animasi fade-in pada kontainer */
     }
 
     .image {
@@ -68,8 +66,6 @@
       object-fit: cover;
       display: block;
       margin: 1rem auto;
-      animation: fadeIn 1.5s ease-in-out; /* Animasi fade-in pada gambar */
-      opacity: 0;
     }
 
     hr {
@@ -115,6 +111,7 @@
       padding: 0.3rem;
       transition: all 200ms ease-in-out;
       box-shadow: rgb(37 39 89 / 8%) 0px 8px 8px 0;
+      width: auto;
       animation: none;
     }
 
@@ -122,7 +119,6 @@
       border: 0.1rem solid #27213b;
       background-color: #f8923b;
       cursor: pointer;
-      transform: scale(1.05); /* Hover effect */
     }
 
     #effetsalju {
@@ -159,24 +155,6 @@
     @keyframes blink {
       50% {
         border-color: transparent;
-      }
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    @keyframes scrollBgEffect {
-      0% {
-        background-position: 0 0;
-      }
-      100% {
-        background-position: 100% 100%;
       }
     }
   </style>
