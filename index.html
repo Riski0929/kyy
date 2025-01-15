@@ -31,6 +31,7 @@
 
     body {
       background-image: url("https://telegra.ph/file/c93081f7c7e739a9bef5f.jpg");
+      background-attachment: fixed;
       background-repeat: no-repeat;
       background-size: cover;
       width: 100%;
@@ -131,15 +132,6 @@
       z-index: 0;
     }
 
-    .fade-in {
-      opacity: 0;
-      transition: opacity 1s ease-in-out;
-    }
-
-    .fade-in.visible {
-      opacity: 1;
-    }
-
     @media only screen and (min-width: 992px) {
       .image {
         width: 15rem;
@@ -171,7 +163,7 @@
 <body>
   <div id="effetsalju"></div>
   <main>
-    <div class="container shadow fade-in">
+    <div class="container shadow">
       <img class="image" src="https://files.catbox.moe/w7s7zc.jpeg" alt="siputzx Picture" loading="lazy">
       <h1>HorseTech Production</h1>
       <p class="occupation">Contact me</p>
@@ -188,16 +180,5 @@
       <p class="location"><i class="fa fa-map-marker icon" aria-hidden="true"></i> Indonesia</p>
     </div>
   </main>
-
-  <script>
-    window.addEventListener('scroll', function() {
-      const elements = document.querySelectorAll('.fade-in');
-      elements.forEach(element => {
-        if (element.getBoundingClientRect().top < window.innerHeight) {
-          element.classList.add('visible');
-        }
-      });
-    });
-  </script>
 </body>
 </html>
