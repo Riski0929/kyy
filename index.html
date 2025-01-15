@@ -131,6 +131,15 @@
       z-index: 0;
     }
 
+    .fade-in {
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+    }
+
     @media only screen and (min-width: 992px) {
       .image {
         width: 15rem;
@@ -162,7 +171,7 @@
 <body>
   <div id="effetsalju"></div>
   <main>
-    <div class="container shadow">
+    <div class="container shadow fade-in">
       <img class="image" src="https://files.catbox.moe/w7s7zc.jpeg" alt="siputzx Picture" loading="lazy">
       <h1>HorseTech Production</h1>
       <p class="occupation">Contact me</p>
@@ -171,7 +180,7 @@
         <a class="shadow" title="View Siputzx GitHub profile" href="https://github.com/Riski0929" target="_blank"><i class="fa fa-github icon" aria-hidden="true"></i> GitHub</a>
         <a class="shadow" title="Send a message to Siputzx" href="https://t.me/kyenzyy" target="_blank"><i class="fa-brands fa-telegram" aria-hidden="true"></i> Telegram</a>
         <a class="shadow" title="Send a mail to Dich" href="mailto: enzyky4@gmail.com" target="_blank"><i class="fas fa-envelope" aria-hidden="true"></i> Email</a>
-        <a class="shadow" title="Send a message to Siputzx" href="https://wa.me/6282189451851?text=Aku%20mau%20nonton%20donghua%20dong%20bang%F0%9F%a4%BF" target="_blank"><i class="fa fa-whatsapp icon" aria-hidden="true"></i> WhatsApp</a>
+        <a class="shadow" title="Send a message to Siputzx" href="https://wa.me/6282189451851?text=Aku%20mau%20nonton%20donghua%20dong%20bang%F0%9F%a4%bf" target="_blank"><i class="fa fa-whatsapp icon" aria-hidden="true"></i> WhatsApp</a>
         <a class="shadow" title="Send a message to Siputzx Bot" href="https://wa.me/6282189451851?text=Hello%20Bot" target="_blank"><i class="fa fa-whatsapp icon" aria-hidden="true"></i> WhatsApp Bot</a>
         <a class="shadow" title="Visit Anichin's website" href="https://anichin.dev/throne-of-seal/" target="_blank"><i class="fa fa-globe" aria-hidden="true"></i> Anichin</a>
       </div>
@@ -179,5 +188,16 @@
       <p class="location"><i class="fa fa-map-marker icon" aria-hidden="true"></i> Indonesia</p>
     </div>
   </main>
+
+  <script>
+    window.addEventListener('scroll', function() {
+      const elements = document.querySelectorAll('.fade-in');
+      elements.forEach(element => {
+        if (element.getBoundingClientRect().top < window.innerHeight) {
+          element.classList.add('visible');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
