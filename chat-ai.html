@@ -61,10 +61,14 @@
 
   <script>
   const apiKey = "BtzIkyy";
+  let previousMessages = [];
 
   async function sendMessage() {
     const userText = document.getElementById('userInput').value.trim();
     if (!userText) return;
+
+    // Simpan pesan user ke riwayat
+    previousMessages.push({ role: "user", content: userText });
 
     // Tampilkan pesan user di UI
     document.getElementById('chatOutput').innerHTML += `
@@ -72,7 +76,7 @@
     `;
 
     try {
-      // Kirim pesan ke API
+      // Kirim riwayat percakapan ke API
       const response = await fetch(
         `https://api.betabotz.eu.org/api/search/openai-chat?text=${encodeURIComponent(userText)}&apikey=${apiKey}`
       );
@@ -81,10 +85,18 @@
       if (data.status) {
         const aiResponse = data.message;
 
+        // Simpan respons AI ke riwayat
+        previousMessages.push({ role: "assistant", content: aiResponse });
+
         // Tampilkan respons AI di UI
         document.getElementById('chatOutput').innerHTML += `
           <div class="message ai-message"><p><strong>AI:</strong> ${aiResponse}</p></div>
         `;
+
+        // Hapus pesan lama jika melebihi batas tertentu (misalnya, 5 pesan terakhir)
+        if (previousMessages.length > 10) {
+          previousMessages.shift();  // Hapus pesan pertama dalam riwayat
+        }
       } else {
         throw new Error("Error dari API");
       }
