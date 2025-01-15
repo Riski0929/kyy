@@ -1,48 +1,58 @@
-/* Styling dasar */
+/* Reset dan styling dasar */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f0f4f8;
-    margin: 0;
-    padding: 0;
     text-align: center;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px;
+    padding: 50px 20px;
 }
 
 /* Header */
 header {
     background-color: #1d1f2f;
     color: white;
-    padding: 60px 20px;
+    padding: 40px 20px;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
     font-size: 3em;
-    margin: 0;
+    margin-bottom: 10px;
 }
 
 header p {
     font-size: 1.2em;
-    margin: 20px 0;
+    margin-top: 5px;
 }
 
-/* Styling untuk media sosial */
+/* Section Kontak */
+.contact {
+    margin-top: 40px;
+}
+
+.contact h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+/* Styling untuk ikon media sosial */
 .social-links {
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-top: 30px;
+    flex-wrap: wrap;
+    margin-top: 20px;
 }
 
 .social-icon {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -52,7 +62,6 @@ header p {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 50%;
 }
 
 .social-icon:hover {
