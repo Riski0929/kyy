@@ -26,39 +26,22 @@ header p {
     font-size: 1.2em;
 }
 
-/* Link */
-a {
-    text-decoration: none;
-    color: #fff;
-    background-color: #0056b3;
-    padding: 10px 15px;
-    border-radius: 5px;
-    margin: 10px;
+/* Styling untuk media sosial */
+.social-links {
+    margin-top: 20px;
+}
+
+.social-links a {
+    margin: 0 10px;
     display: inline-block;
-    transition: background-color 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
-a:hover {
-    background-color: #003d80;
+.social-links a:hover {
+    transform: scale(1.2);
 }
 
-/* Tombol */
-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    font-weight: bold;
-    color: white;
-    background-color: #28a745;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #218838;
-}
-
-button:active {
-    background-color: #1e7e34;
+.social-links img {
+    width: 40px;
+    height: 40px;
 }
