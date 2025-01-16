@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/chat-ai", "destination": "/chat-ai.html" }
+  ]
+}
