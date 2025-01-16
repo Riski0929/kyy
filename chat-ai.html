@@ -129,7 +129,12 @@
       try {
         const today = new Date();
         const formattedDate = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
-        const fallbackPrompt = `${siputzxApi}${encodeURIComponent(userText + ". Hari ini tanggal " + formattedDate)}`;
+        const keywords = ["tanggal", "bulan", "tahun"];
+        const shouldMentionDate = keywords.some((keyword) => userText.toLowerCase().includes(keyword));
+        const fallbackPrompt = shouldMentionDate
+          ? `${siputzxApi}${encodeURIComponent(userText + ". Hari ini tanggal " + formattedDate)}`
+          : `${siputzxApi}${encodeURIComponent(userText)}`;
+
         const fallbackResponse = await fetch(fallbackPrompt);
         const fallbackData = await fallbackResponse.json();
 
