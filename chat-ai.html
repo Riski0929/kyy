@@ -102,7 +102,7 @@
       </div>
     `;
 
-    // Coba API pertama
+    // Coba API Betabotz
     try {
       const response = await fetch(`https://api.betabotz.eu.org/api/search/openai-chat?text=${encodeURIComponent(userText)}&apikey=${apiKey}`);
       const data = await response.json();
@@ -127,7 +127,10 @@
 
       // Fallback ke API siputzx.my.id
       try {
-        const fallbackResponse = await fetch(`${siputzxApi}${encodeURIComponent(userText)}`);
+        const today = new Date();
+        const formattedDate = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+        const fallbackPrompt = `${siputzxApi}${encodeURIComponent(userText + ". Hari ini tanggal " + formattedDate)}`;
+        const fallbackResponse = await fetch(fallbackPrompt);
         const fallbackData = await fallbackResponse.json();
 
         if (fallbackData.data) {
@@ -168,5 +171,3 @@
 </script>
 </body>
 </html>
-
-Jangan di hapus Beta botz jir. Cukup ubah prompt siputzx aja biar tau tanggal bulan dan tahun sekarang 
