@@ -194,7 +194,7 @@
     function startGame() {
       createGrid();
       createPiece();
-      gameInterval = setInterval(movePiece, 1000);
+      gameInterval = setInterval(movePiece, 500);
       document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') {
           moveLeft();
