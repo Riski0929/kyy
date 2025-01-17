@@ -54,16 +54,16 @@
         audio.play();
       } else {
         audio.pause();
-        // Pastikan audio tidak hanya di-pause, tapi juga dimatikan dengan mengubah sumber menjadi null
-        audio.src = '';
-        audio.load();
+        // Tidak menghapus sumber audio, hanya menghentikan
+        audio.src = ''; // Sementara berhenti
+        audio.load(); // Reload untuk memastikan tidak ada suara
       }
     }
 
     function changeMusic() {
       musicIndex = (musicIndex + 1) % musicList.length;
       source.src = musicList[musicIndex];
-      audio.load(); // Memastikan audio dimuat ulang
+      audio.load(); // Pastikan audio dimuat ulang
       audio.play(); // Memutar audio setelah dimuat ulang
     }
   </script>
