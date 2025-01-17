@@ -132,6 +132,13 @@
       z-index: 0;
     }
 
+    .time {
+      font-size: 1.5rem;
+      font-family: "Space Mono", monospace;
+      margin-top: 1rem;
+      color: white;
+    }
+
     @media only screen and (min-width: 992px) {
       .image {
         width: 15rem;
@@ -182,7 +189,27 @@
 
       <!-- Button to open AI Chat page -->
       <a href="/chat-ai" class="btn btn-primary btn-lg mt-3">Chat with AI</a>
+
+      <!-- Display current time -->
+      <p class="time" id="current-time"></p>
     </div>
   </main>
+
+  <script>
+    function updateClock() {
+      const timeElement = document.getElementById('current-time');
+      const currentTime = new Date();
+      const hours = String(currentTime.getHours()).padStart(2, '0');
+      const minutes = String(currentTime.getMinutes()).padStart(2, '0');
+      const seconds = String(currentTime.getSeconds()).padStart(2, '0');
+      timeElement.textContent = `Current Time: ${hours}:${minutes}:${seconds}`;
+    }
+
+    // Update the clock every second
+    setInterval(updateClock, 1000);
+
+    // Initial clock update
+    updateClock();
+  </script>
 </body>
-                                                                                                                                                                 </html>
+                                                                                                                                                                             </html>
