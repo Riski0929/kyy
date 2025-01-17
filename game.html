@@ -121,7 +121,11 @@
 
     if (bombPositions.includes(index)) {
       grid[index].textContent = '💣';
-      endGame(false);
+      lives--; // Mengurangi nyawa jika terkena bom
+      livesElement.textContent = lives;
+      if (lives <= 0) {
+        endGame(false);
+      }
     } else {
       grid[index].textContent = '🌀';
       safeCellsRevealed++;
