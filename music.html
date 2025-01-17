@@ -5,15 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Music Player</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.rawgit.com/bungfrangki/efeksalju/2a7805c7/efek-salju.js" type="text/javascript"></script>
   <style>
     body {
-      background-color: #121212;
+      background-image: url('https://telegra.ph/file/c93081f7c7e739a9bef5f.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
       color: white;
-      text-align: center;
-      padding: 20px;
     }
     .container {
-      margin-top: 50px;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      color: #fff;
+    }
+    h1, p {
+      text-align: center;
     }
     .btn {
       margin: 10px;
@@ -32,7 +42,6 @@
   </style>
 </head>
 <body>
-
   <div class="container">
     <h1>🎶 Music Player 🎶</h1>
     <p>Musik akan terus diputar selama Anda berada di website.</p>
@@ -59,59 +68,62 @@
   </div>
 
   <script>
-  let musicIndex = 0;
-  const musicList = [
-    { name: "Sesuatu Yang Sempurna - Hijau Daun", file: "AUD-20250117-WA0124.mp3" },
-    { name: "Hujan - Utopia", file: "AUD-20250117-WA0126.mp3" },
-    { name: "Kembali Pulang - Kangen Band", file: "Kembali-pulang.mp3" }
-  ];
+    let musicIndex = 0;
+    const musicList = [
+      { name: "Sesuatu Yang Sempurna - Hijau Daun", file: "AUD-20250117-WA0124.mp3" },
+      { name: "Hujan - Utopia", file: "AUD-20250117-WA0126.mp3" },
+      { name: "Kembali Pulang - Kangen Band", file: "Kembali-pulang.mp3" }
+    ];
 
-  const audio = document.getElementById("audio-player");
-  const source = document.getElementById("audio-source");
-  const musicListContainer = document.getElementById("music-list");
+    const audio = document.getElementById("audio-player");
+    const source = document.getElementById("audio-source");
+    const musicListContainer = document.getElementById("music-list");
 
-  function toggleMusic() {
-    if (audio.paused) {
+    function toggleMusic() {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause(); // Hanya menghentikan musik
+      }
+    }
+
+    function changeMusic() {
+      musicIndex = (musicIndex + 1) % musicList.length;
+      source.src = musicList[musicIndex].file;
+      audio.load(); // Reload audio dengan sumber yang baru
+      audio.play(); // Memutar musik baru setelah di-load
+    }
+
+    function showMusicList() {
+      if (musicListContainer.style.display === "none") {
+        musicListContainer.style.display = "block";
+      } else {
+        musicListContainer.style.display = "none";
+      }
+    }
+
+    function generateMusicList() {
+      musicListContainer.innerHTML = ""; // Kosongkan daftar dulu
+      musicList.forEach((music, index) => {
+        const li = document.createElement("li");
+        li.textContent = `${index + 1}. ${music.name}`;
+        li.onclick = () => selectMusic(index);
+        musicListContainer.appendChild(li);
+      });
+    }
+
+    function selectMusic(index) {
+      musicIndex = index;
+      source.src = musicList[musicIndex].file;
+      audio.load();
       audio.play();
-    } else {
-      audio.pause(); // Hanya menghentikan musik
     }
-  }
 
-  function changeMusic() {
-    musicIndex = (musicIndex + 1) % musicList.length;
-    source.src = musicList[musicIndex].file;
-    audio.load(); // Reload audio dengan sumber yang baru
-    audio.play(); // Memutar musik baru setelah di-load
-  }
+    generateMusicList(); // Panggil fungsi ini pas halaman dimuat
 
-  function showMusicList() {
-    if (musicListContainer.style.display === "none") {
-      musicListContainer.style.display = "block";
-    } else {
-      musicListContainer.style.display = "none";
-    }
-  }
-
-  function generateMusicList() {
-    musicListContainer.innerHTML = ""; // Kosongkan daftar dulu
-    musicList.forEach((music, index) => {
-      const li = document.createElement("li");
-      li.textContent = `${index + 1}. ${music.name}`;
-      li.onclick = () => selectMusic(index);
-      musicListContainer.appendChild(li);
-    });
-  }
-
-  function selectMusic(index) {
-    musicIndex = index;
-    source.src = musicList[musicIndex].file;
-    audio.load();
-    audio.play();
-  }
-
-  generateMusicList(); // Panggil fungsi ini pas halaman dimuat
+    window.onload = function() {
+      efekSalju(); // Menjalankan efek salju
+    };
   </script>
-
 </body>
 </html>
