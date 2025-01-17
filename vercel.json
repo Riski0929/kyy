@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/chat-ai", "destination": "/chat-ai.html" },
-    { "source": "/music", "destination": "/music.html" }
+    { "source": "/music", "destination": "/music.html" },
+    { "source": "/game", "destination": "/game.html" }
   ]
 }
