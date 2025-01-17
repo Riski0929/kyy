@@ -3,204 +3,155 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Tetris</title>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Whack-a-Mole Game</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-color: #222;
+      background-color: #f0f0f0;
       margin: 0;
     }
 
-    #tetris {
+    .game-container {
+      position: relative;
       display: grid;
-      grid-template-columns: repeat(10, 30px);
-      grid-template-rows: repeat(20, 30px);
-      gap: 1px;
-      background-color: #111;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
     }
 
-    .cell {
-      width: 30px;
-      height: 30px;
-      background-color: #333;
+    .hole {
+      width: 100px;
+      height: 100px;
+      background-color: #8b4513;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
     }
 
-    .active {
-      background-color: #ff0;
-    }
-
-    #game-over {
-      color: white;
-      font-size: 2em;
-      text-align: center;
+    .mole {
+      width: 50px;
+      height: 50px;
+      background-color: #000;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
       display: none;
+    }
+
+    .score {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .start-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .start-button:hover {
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
 
-  <div id="game-over">Game Over!</div>
-  <div id="tetris"></div>
+<div>
+  <div class="score">Score: <span id="score">0</span></div>
+  <button class="start-button" id="startButton">Start Game</button>
+  <div class="game-container">
+    <div class="hole" id="hole1"><div class="mole" id="mole1"></div></div>
+    <div class="hole" id="hole2"><div class="mole" id="mole2"></div></div>
+    <div class="hole" id="hole3"><div class="mole" id="mole3"></div></div>
+    <div class="hole" id="hole4"><div class="mole" id="mole4"></div></div>
+    <div class="hole" id="hole5"><div class="mole" id="mole5"></div></div>
+    <div class="hole" id="hole6"><div class="mole" id="mole6"></div></div>
+    <div class="hole" id="hole7"><div class="mole" id="mole7"></div></div>
+    <div class="hole" id="hole8"><div class="mole" id="mole8"></div></div>
+    <div class="hole" id="hole9"><div class="mole" id="mole9"></div></div>
+  </div>
+</div>
 
-  <script>
-    const grid = document.getElementById('tetris');
-    const gameOverMessage = document.getElementById('game-over');
-    const rows = 20;
-    const cols = 10;
-    let board = Array.from({ length: rows }, () => Array(cols).fill(0));
-    let currentPiece = null;
-    let currentPosition = { row: 0, col: 4 }; // Posisi awal potongan
-    let gameInterval;
+<script>
+  let score = 0;
+  let gameInterval;
+  let moleInterval;
+  let gameActive = false;
 
-    // Membuat grid
-    function createGrid() {
-      grid.innerHTML = '';
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const cell = document.createElement('div');
-          cell.classList.add('cell');
-          grid.appendChild(cell);
-        }
+  const scoreElement = document.getElementById('score');
+  const startButton = document.getElementById('startButton');
+  const moles = [
+    document.getElementById('mole1'),
+    document.getElementById('mole2'),
+    document.getElementById('mole3'),
+    document.getElementById('mole4'),
+    document.getElementById('mole5'),
+    document.getElementById('mole6'),
+    document.getElementById('mole7'),
+    document.getElementById('mole8'),
+    document.getElementById('mole9')
+  ];
+
+  startButton.addEventListener('click', startGame);
+
+  function startGame() {
+    score = 0;
+    scoreElement.textContent = score;
+    gameActive = true;
+    startButton.disabled = true;
+
+    gameInterval = setInterval(() => {
+      if (!gameActive) {
+        clearInterval(gameInterval);
+        startButton.disabled = false;
+        return;
       }
-    }
+      randomMole();
+    }, 800);
 
-    // Menampilkan board
-    function draw() {
-      const cells = grid.querySelectorAll('.cell');
-      cells.forEach(cell => cell.classList.remove('active'));
-
-      board.forEach((row, rowIndex) => {
-        row.forEach((cell, colIndex) => {
-          if (cell) {
-            const index = rowIndex * cols + colIndex;
-            cells[index].classList.add('active');
-          }
-        });
-      });
-    }
-
-    // Membuat bentuk Tetris
-    function createPiece() {
-      const pieces = [
-        { shape: [[1, 1, 1], [0, 1, 0]], color: 'yellow' },   // T
-        { shape: [[1, 1], [1, 1]], color: 'red' },             // O
-        { shape: [[1, 0, 0], [1, 1, 1]], color: 'green' },     // L
-        { shape: [[0, 0, 1], [1, 1, 1]], color: 'blue' },      // J
-        { shape: [[0, 1, 1], [1, 1, 0]], color: 'purple' },    // S
-      ];
-
-      const randomIndex = Math.floor(Math.random() * pieces.length);
-      currentPiece = pieces[randomIndex];
-      currentPosition = { row: 0, col: 4 }; // reset posisi awal potongan
-    }
-
-    // Memasukkan bentuk potongan ke board
-    function placePiece() {
-      const shape = currentPiece.shape;
-      const { row, col } = currentPosition;
-
-      for (let r = 0; r < shape.length; r++) {
-        for (let c = 0; c < shape[r].length; c++) {
-          if (shape[r][c]) {
-            board[row + r][col + c] = 1;
-          }
-        }
+    moleInterval = setInterval(() => {
+      if (gameActive) {
+        hideMoles();
       }
-    }
+    }, 1000);
+  }
 
-    // Menggerakkan potongan ke bawah
-    function moveDown() {
-      currentPosition.row++;
-      if (isCollision()) {
-        currentPosition.row--; // Kembali ke posisi semula jika ada tabrakan
-        placePiece(); // Tempatkan potongan di board
-        createPiece(); // Buat potongan baru
-        if (isGameOver()) {
-          clearInterval(gameInterval);
-          gameOverMessage.style.display = 'block';
-        }
-      }
-      draw();
-    }
+  function randomMole() {
+    const randomIndex = Math.floor(Math.random() * moles.length);
+    const mole = moles[randomIndex];
 
-    // Mengecek tabrakan
-    function isCollision() {
-      const shape = currentPiece.shape;
-      const { row, col } = currentPosition;
+    mole.style.display = 'block';
 
-      for (let r = 0; r < shape.length; r++) {
-        for (let c = 0; c < shape[r].length; c++) {
-          if (shape[r][c]) {
-            if (row + r >= rows || col + c < 0 || col + c >= cols || board[row + r][col + c]) {
-              return true;
-            }
-          }
-        }
-      }
-      return false;
-    }
-
-    // Memeriksa apakah permainan sudah berakhir
-    function isGameOver() {
-      return currentPosition.row <= 0;
-    }
-
-    // Gerakan kiri dan kanan
-    function moveLeft() {
-      currentPosition.col--;
-      if (isCollision()) {
-        currentPosition.col++; // Kembalikan ke posisi semula jika ada tabrakan
-      }
-      draw();
-    }
-
-    function moveRight() {
-      currentPosition.col++;
-      if (isCollision()) {
-        currentPosition.col--; // Kembalikan ke posisi semula jika ada tabrakan
-      }
-      draw();
-    }
-
-    // Rotasi potongan
-    function rotate() {
-      const shape = currentPiece.shape;
-      const rotatedShape = shape[0].map((_, index) => shape.map(row => row[index])).reverse();
-
-      currentPiece.shape = rotatedShape;
-
-      if (isCollision()) {
-        currentPiece.shape = shape; // Kembalikan rotasi jika tabrakan
-      }
-
-      draw();
-    }
-
-    // Mendengarkan input keyboard
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft') {
-        moveLeft();
-      } else if (e.key === 'ArrowRight') {
-        moveRight();
-      } else if (e.key === 'ArrowDown') {
-        moveDown();
-      } else if (e.key === 'ArrowUp') {
-        rotate();
-      }
+    mole.addEventListener('click', function onClick() {
+      score++;
+      scoreElement.textContent = score;
+      mole.style.display = 'none';
+      mole.removeEventListener('click', onClick);
     });
 
-    // Memulai game
-    function startGame() {
-      createGrid();
-      createPiece();
-      gameInterval = setInterval(moveDown, 500); // Potongan bergerak setiap 500ms
-    }
+    setTimeout(() => {
+      mole.style.display = 'none';
+    }, 800);
+  }
 
-    startGame();
+  function hideMoles() {
+    moles.forEach(mole => {
+      mole.style.display = 'none';
+    });
+  }
+</script>
 
-  </script>
 </body>
 </html>
