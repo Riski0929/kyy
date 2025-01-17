@@ -53,18 +53,15 @@
       if (audio.paused) {
         audio.play();
       } else {
-        audio.pause();
-        // Tidak menghapus sumber audio, hanya menghentikan
-        audio.src = ''; // Sementara berhenti
-        audio.load(); // Reload untuk memastikan tidak ada suara
+        audio.pause(); // Hanya menghentikan musik
       }
     }
 
     function changeMusic() {
       musicIndex = (musicIndex + 1) % musicList.length;
       source.src = musicList[musicIndex];
-      audio.load(); // Pastikan audio dimuat ulang
-      audio.play(); // Memutar audio setelah dimuat ulang
+      audio.load(); // Reload audio dengan sumber yang baru
+      audio.play(); // Memutar musik baru setelah di-load
     }
   </script>
 
