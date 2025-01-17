@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Snake Game | Ky Production</title>
+  <link rel="icon" href="https://files.catbox.moe/f9c58c.jpg" type="image/x-icon">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    canvas {
+      border: 1px solid black;
+      background-color: #fff;
+    }
+
+    .game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="gameCanvas" width="400" height="400"></canvas>
+<div class="game-over" id="gameOverText" style="display: none;">Game Over! Press F5 to Restart</div>
+
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const scale = 20;
+  const rows = canvas.height / scale;
+  const columns = canvas.width / scale;
+
+  let snake;
+  let apple;
+  let gameOver = false;
+
+  // Start new game
+  function startGame() {
+    snake = new Snake();
+    apple = new Apple();
+    gameOver = false;
+    document.getElementById('gameOverText').style.display = 'none';
+    window.setInterval(updateGame, 100);
+  }
+
+  // Update the game every 100ms
+  function updateGame() {
+    if (gameOver) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    snake.move();
+    snake.draw();
+    apple.draw();
+
+    if (snake.eatApple(apple)) {
+      apple.randomizePosition();
+    }
+
+    if (snake.collidesWithWall() || snake.collidesWithSelf()) {
+      gameOver = true;
+      document.getElementById('gameOverText').style.display = 'block';
+    }
+  }
+
+  // Snake class
+  function Snake() {
+    this.body = [{ x: 5, y: 5 }];
+    this.direction = 'RIGHT';
+
+    // Draw snake
+    this.draw = function() {
+      ctx.fillStyle = 'green';
+      for (let i = 0; i < this.body.length; i++) {
+        ctx.fillRect(this.body[i].x * scale, this.body[i].y * scale, scale, scale);
+      }
+    };
+
+    // Move snake
+    this.move = function() {
+      const head = { ...this.body[0] };
+
+      switch (this.direction) {
+        case 'UP': head.y -= 1; break;
+        case 'DOWN': head.y += 1; break;
+        case 'LEFT': head.x -= 1; break;
+        case 'RIGHT': head.x += 1; break;
+      }
+
+      this.body.unshift(head);
+      this.body.pop();
+    };
+
+    // Check if snake eats apple
+    this.eatApple = function(apple) {
+      if (this.body[0].x === apple.x && this.body[0].y === apple.y) {
+        this.body.push({ x: this.body[this.body.length - 1].x, y: this.body[this.body.length - 1].y });
+        return true;
+      }
+      return false;
+    };
+
+    // Check collision with wall
+    this.collidesWithWall = function() {
+      const head = this.body[0];
+      return head.x < 0 || head.x >= columns || head.y < 0 || head.y >= rows;
+    };
+
+    // Check collision with self
+    this.collidesWithSelf = function() {
+      const head = this.body[0];
+      for (let i = 1; i < this.body.length; i++) {
+        if (this.body[i].x === head.x && this.body[i].y === head.y) {
+          return true;
+        }
+      }
+      return false;
+    };
+  }
+
+  // Apple class
+  function Apple() {
+    this.x = 0;
+    this.y = 0;
+
+    // Randomize apple position
+    this.randomizePosition = function() {
+      this.x = Math.floor(Math.random() * columns);
+      this.y = Math.floor(Math.random() * rows);
+    };
+
+    // Draw apple
+    this.draw = function() {
+      ctx.fillStyle = 'red';
+      ctx.fillRect(this.x * scale, this.y * scale, scale, scale);
+    };
+  }
+
+  // Control snake movement
+  document.addEventListener('keydown', function(event) {
+    if (gameOver) return;
+    switch (event.key) {
+      case 'ArrowUp': if (snake.direction !== 'DOWN') snake.direction = 'UP'; break;
+      case 'ArrowDown': if (snake.direction !== 'UP') snake.direction = 'DOWN'; break;
+      case 'ArrowLeft': if (snake.direction !== 'RIGHT') snake.direction = 'LEFT'; break;
+      case 'ArrowRight': if (snake.direction !== 'LEFT') snake.direction = 'RIGHT'; break;
+    }
+  });
+
+  startGame();
+</script>
+
+</body>
+</html>
