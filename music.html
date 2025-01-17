@@ -60,8 +60,8 @@
     function changeMusic() {
       musicIndex = (musicIndex + 1) % musicList.length;
       source.src = musicList[musicIndex];
-      audio.load();
-      audio.play();
+      audio.load(); // Memastikan audio dimuat ulang
+      audio.play(); // Memutar audio setelah dimuat ulang
     }
   </script>
 
