@@ -58,37 +58,57 @@
   </div>
 
   <script>
-    let musicIndex = 0;
-    const musicList = [
-      "AUD-20250117-WA0124.mp3", 
-      "AUD-20250117-WA0126.mp3"
-    ];
-    const audio = document.getElementById("audio-player");
-    const source = document.getElementById("audio-source");
-    const musicListContainer = document.getElementById("music-list");
+  let musicIndex = 0;
+  const musicList = [
+    { name: "Lagu Pertama", file: "AUD-20250117-WA0124.mp3" },
+    { name: "Lagu Kedua", file: "AUD-20250117-WA0126.mp3" }
+  ];
 
-    function toggleMusic() {
-      if (audio.paused) {
-        audio.play();
-      } else {
-        audio.pause(); // Hanya menghentikan musik
-      }
-    }
+  const audio = document.getElementById("audio-player");
+  const source = document.getElementById("audio-source");
+  const musicListContainer = document.getElementById("music-list");
 
-    function changeMusic() {
-      musicIndex = (musicIndex + 1) % musicList.length;
-      source.src = musicList[musicIndex];
-      audio.load(); // Reload audio dengan sumber yang baru
-      audio.play(); // Memutar musik baru setelah di-load
+  function toggleMusic() {
+    if (audio.paused) {
+      audio.play();
+    } else {
+      audio.pause(); // Hanya menghentikan musik
     }
+  }
 
-    function showMusicList() {
-      if (musicListContainer.style.display === "none") {
-        musicListContainer.style.display = "block";
-      } else {
-        musicListContainer.style.display = "none";
-      }
+  function changeMusic() {
+    musicIndex = (musicIndex + 1) % musicList.length;
+    source.src = musicList[musicIndex].file;
+    audio.load(); // Reload audio dengan sumber yang baru
+    audio.play(); // Memutar musik baru setelah di-load
+  }
+
+  function showMusicList() {
+    if (musicListContainer.style.display === "none") {
+      musicListContainer.style.display = "block";
+    } else {
+      musicListContainer.style.display = "none";
     }
+  }
+
+  function generateMusicList() {
+    musicListContainer.innerHTML = ""; // Kosongkan daftar dulu
+    musicList.forEach((music, index) => {
+      const li = document.createElement("li");
+      li.textContent = `${index + 1}. ${music.name}`;
+      li.onclick = () => selectMusic(index);
+      musicListContainer.appendChild(li);
+    });
+  }
+
+  function selectMusic(index) {
+    musicIndex = index;
+    source.src = musicList[musicIndex].file;
+    audio.load();
+    audio.play();
+  }
+
+  generateMusicList(); // Panggil fungsi ini pas halaman dimuat
   </script>
 
 </body>
