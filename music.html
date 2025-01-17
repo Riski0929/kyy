@@ -54,6 +54,9 @@
         audio.play();
       } else {
         audio.pause();
+        // Pastikan audio tidak hanya di-pause, tapi juga dimatikan dengan mengubah sumber menjadi null
+        audio.src = '';
+        audio.load();
       }
     }
 
