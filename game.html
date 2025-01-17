@@ -3,165 +3,212 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Snake Game | Ky Production</title>
-  <link rel="icon" href="https://files.catbox.moe/f9c58c.jpg" type="image/x-icon">
+  <title>Game Tetris</title>
   <style>
     body {
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      background-color: #222;
       margin: 0;
-      background-color: #f0f0f0;
     }
 
-    canvas {
-      border: 1px solid black;
-      background-color: #fff;
+    #tetris {
+      display: grid;
+      grid-template-columns: repeat(10, 30px);
+      grid-template-rows: repeat(20, 30px);
+      gap: 1px;
+      background-color: #111;
     }
 
-    .game-over {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2rem;
-      color: #333;
+    .cell {
+      width: 30px;
+      height: 30px;
+      background-color: #333;
+    }
+
+    .active {
+      background-color: #ff0;
+    }
+
+    #game-over {
+      color: white;
+      font-size: 2em;
+      text-align: center;
+      display: none;
     }
   </style>
 </head>
 <body>
 
-<canvas id="gameCanvas" width="400" height="400"></canvas>
-<div class="game-over" id="gameOverText" style="display: none;">Game Over! Press F5 to Restart</div>
+  <div id="game-over">Game Over!</div>
+  <div id="tetris"></div>
 
-<script>
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
-  const scale = 20;
-  const rows = canvas.height / scale;
-  const columns = canvas.width / scale;
+  <script>
+    const grid = document.getElementById('tetris');
+    const gameOverMessage = document.getElementById('game-over');
+    const rows = 20;
+    const cols = 10;
+    let board = Array.from({ length: rows }, () => Array(cols).fill(0));
+    let currentPiece = null;
+    let gameInterval;
 
-  let snake;
-  let apple;
-  let gameOver = false;
-
-  // Start new game
-  function startGame() {
-    snake = new Snake();
-    apple = new Apple();
-    gameOver = false;
-    document.getElementById('gameOverText').style.display = 'none';
-    window.setInterval(updateGame, 100);
-  }
-
-  // Update the game every 100ms
-  function updateGame() {
-    if (gameOver) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    snake.move();
-    snake.draw();
-    apple.draw();
-
-    if (snake.eatApple(apple)) {
-      apple.randomizePosition();
+    // Membuat grid
+    function createGrid() {
+      grid.innerHTML = '';
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          grid.appendChild(cell);
+        }
+      }
     }
 
-    if (snake.collidesWithWall() || snake.collidesWithSelf()) {
-      gameOver = true;
-      document.getElementById('gameOverText').style.display = 'block';
+    // Menampilkan board
+    function draw() {
+      const cells = grid.querySelectorAll('.cell');
+      cells.forEach(cell => cell.classList.remove('active'));
+
+      board.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+          if (cell) {
+            const index = rowIndex * cols + colIndex;
+            cells[index].classList.add('active');
+          }
+        });
+      });
     }
-  }
 
-  // Snake class
-  function Snake() {
-    this.body = [{ x: 5, y: 5 }];
-    this.direction = 'RIGHT';
+    // Membuat bentuk Tetris
+    function createPiece() {
+      const pieces = [
+        { shape: [[1, 1, 1], [0, 1, 0]], color: 'yellow' },
+        { shape: [[1, 1], [1, 1]], color: 'red' },
+        { shape: [[1, 0, 0], [1, 1, 1]], color: 'green' },
+        { shape: [[0, 0, 1], [1, 1, 1]], color: 'blue' },
+        { shape: [[0, 1, 1], [1, 1, 0]], color: 'orange' },
+      ];
 
-    // Draw snake
-    this.draw = function() {
-      ctx.fillStyle = 'green';
-      for (let i = 0; i < this.body.length; i++) {
-        ctx.fillRect(this.body[i].x * scale, this.body[i].y * scale, scale, scale);
-      }
-    };
+      const piece = pieces[Math.floor(Math.random() * pieces.length)];
+      currentPiece = {
+        shape: piece.shape,
+        x: Math.floor(cols / 2) - 1,
+        y: 0,
+      };
+    }
 
-    // Move snake
-    this.move = function() {
-      const head = { ...this.body[0] };
+    // Cek collision
+    function checkCollision() {
+      const { shape, x, y } = currentPiece;
+      for (let row = 0; row < shape.length; row++) {
+        for (let col = 0; col < shape[row].length; col++) {
+          if (shape[row][col] === 1) {
+            const newX = x + col;
+            const newY = y + row;
 
-      switch (this.direction) {
-        case 'UP': head.y -= 1; break;
-        case 'DOWN': head.y += 1; break;
-        case 'LEFT': head.x -= 1; break;
-        case 'RIGHT': head.x += 1; break;
-      }
-
-      this.body.unshift(head);
-      this.body.pop();
-    };
-
-    // Check if snake eats apple
-    this.eatApple = function(apple) {
-      if (this.body[0].x === apple.x && this.body[0].y === apple.y) {
-        this.body.push({ x: this.body[this.body.length - 1].x, y: this.body[this.body.length - 1].y });
-        return true;
-      }
-      return false;
-    };
-
-    // Check collision with wall
-    this.collidesWithWall = function() {
-      const head = this.body[0];
-      return head.x < 0 || head.x >= columns || head.y < 0 || head.y >= rows;
-    };
-
-    // Check collision with self
-    this.collidesWithSelf = function() {
-      const head = this.body[0];
-      for (let i = 1; i < this.body.length; i++) {
-        if (this.body[i].x === head.x && this.body[i].y === head.y) {
-          return true;
+            if (newX < 0 || newX >= cols || newY >= rows || board[newY][newX]) {
+              return true;
+            }
+          }
         }
       }
       return false;
-    };
-  }
-
-  // Apple class
-  function Apple() {
-    this.x = 0;
-    this.y = 0;
-
-    // Randomize apple position
-    this.randomizePosition = function() {
-      this.x = Math.floor(Math.random() * columns);
-      this.y = Math.floor(Math.random() * rows);
-    };
-
-    // Draw apple
-    this.draw = function() {
-      ctx.fillStyle = 'red';
-      ctx.fillRect(this.x * scale, this.y * scale, scale, scale);
-    };
-  }
-
-  // Control snake movement
-  document.addEventListener('keydown', function(event) {
-    if (gameOver) return;
-    switch (event.key) {
-      case 'ArrowUp': if (snake.direction !== 'DOWN') snake.direction = 'UP'; break;
-      case 'ArrowDown': if (snake.direction !== 'UP') snake.direction = 'DOWN'; break;
-      case 'ArrowLeft': if (snake.direction !== 'RIGHT') snake.direction = 'LEFT'; break;
-      case 'ArrowRight': if (snake.direction !== 'LEFT') snake.direction = 'RIGHT'; break;
     }
-  });
 
-  startGame();
-</script>
+    // Menambahkan piece ke board
+    function addPieceToBoard() {
+      const { shape, x, y } = currentPiece;
+      for (let row = 0; row < shape.length; row++) {
+        for (let col = 0; col < shape[row].length; col++) {
+          if (shape[row][col] === 1) {
+            board[y + row][x + col] = 1;
+          }
+        }
+      }
+    }
 
+    // Menghapus baris penuh
+    function removeFullLines() {
+      for (let row = rows - 1; row >= 0; row--) {
+        if (board[row].every(cell => cell === 1)) {
+          board.splice(row, 1);
+          board.unshift(Array(cols).fill(0));
+        }
+      }
+    }
+
+    // Memindahkan piece
+    function movePiece() {
+      currentPiece.y++;
+      if (checkCollision()) {
+        currentPiece.y--;
+        addPieceToBoard();
+        removeFullLines();
+        createPiece();
+        if (checkCollision()) {
+          gameOver();
+        }
+      }
+      draw();
+    }
+
+    // Menggerakkan piece
+    function moveLeft() {
+      currentPiece.x--;
+      if (checkCollision()) {
+        currentPiece.x++;
+      }
+      draw();
+    }
+
+    function moveRight() {
+      currentPiece.x++;
+      if (checkCollision()) {
+        currentPiece.x--;
+      }
+      draw();
+    }
+
+    function rotatePiece() {
+      const rotatedShape = currentPiece.shape[0].map((_, index) =>
+        currentPiece.shape.map(row => row[index])
+      );
+      const originalShape = currentPiece.shape;
+      currentPiece.shape = rotatedShape;
+
+      if (checkCollision()) {
+        currentPiece.shape = originalShape;
+      }
+      draw();
+    }
+
+    // Game Over
+    function gameOver() {
+      clearInterval(gameInterval);
+      gameOverMessage.style.display = 'block';
+    }
+
+    // Inisialisasi game
+    function startGame() {
+      createGrid();
+      createPiece();
+      gameInterval = setInterval(movePiece, 1000);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+          moveLeft();
+        } else if (e.key === 'ArrowRight') {
+          moveRight();
+        } else if (e.key === 'ArrowDown') {
+          movePiece();
+        } else if (e.key === 'ArrowUp') {
+          rotatePiece();
+        }
+      });
+    }
+
+    startGame();
+  </script>
 </body>
 </html>
