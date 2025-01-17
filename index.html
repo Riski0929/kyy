@@ -19,7 +19,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
   <style>
-    /* CSS styles truncated for brevity. You already have these in your code */
+    /* CSS styles remain unchanged */
+    /* Copy your existing CSS styles here */
   </style>
 </head>
 <body>
@@ -45,16 +46,13 @@
       <!-- Button to open AI Chat page -->
       <a href="/chat-ai" class="btn btn-primary btn-lg mt-3">Chat with AI</a>
 
+      <!-- New button to open the music page -->
+      <a href="/listen-music" class="btn btn-warning btn-lg mt-3">Listen to Music</a>
+
       <!-- Display current time -->
       <p class="time" id="current-time"></p>
     </div>
   </main>
-
-  <!-- Auto-playing background music -->
-  <audio autoplay loop>
-    <source src="https://8030.us.kg/file/vUipyIuHP8dm.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
 
   <script>
   function updateClock() {
@@ -85,5 +83,4 @@
   updateClock();
   </script>
 </body>
-</html>
-
+        </html>
