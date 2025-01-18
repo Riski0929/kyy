@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,6 +58,23 @@
       font-size: 20px;
       margin-top: 20px;
     }
+
+    .back-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ff3b3b;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .back-button:hover {
+      background-color: #cc3232;
+    }
   </style>
 </head>
 <body>
@@ -73,6 +90,9 @@
 <button class="reset-button" id="resetButton">Mulai Ulang</button>
 
 <div class="message" id="message"></div>
+
+<!-- Tombol kembali ke Game Menu -->
+<a href="https://ky-zybotz.vercel.app/game/" class="back-button">⬅️ Kembali ke Game Menu</a>
 
 <script>
   const gridSize = 10; // Ukuran grid 10
