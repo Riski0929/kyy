@@ -2,6 +2,8 @@
   "rewrites": [
     { "source": "/chat-ai", "destination": "/chat-ai.html" },
     { "source": "/music", "destination": "/music.html" },
-    { "source": "/game", "destination": "/game.html" }
+    { "source": "/game", "destination": "/game.html" },
+    { "source": "/tebakbom", "destination": "/tebakbom.html" },
+    { "source": "/tebakkata", "destination": "/tebakkata.html" }
   ]
 }
