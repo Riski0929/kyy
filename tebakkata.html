@@ -37,13 +37,95 @@
             document.getElementById("jawaban").value = "";
         }
 
-        window.onload = ambilSoal;
+        window.onload = function() {
+            ambilSoal();
+            efekSalju(); // Menjalankan efek salju
+        };
     </script>
+    <script src="https://cdn.rawgit.com/bungfrangki/efeksalju/2a7805c7/efek-salju.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('https://telegra.ph/file/c93081f7c7e739a9bef5f.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            margin: 0;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .tebak-button {
+            background-color: #008CBA;
+            color: white;
+        }
+
+        .tebak-button:hover {
+            background-color: #0073a7;
+        }
+
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
 </head>
 <body>
-    <h1>Tebak Kata</h1>
-    <p id="soal">Mengambil soal...</p>
-    <input type="text" id="jawaban">
-    <button onclick="cekJawaban()">Tebak</button>
+    <div class="container">
+        <h1>🔤 Tebak Kata</h1>
+        <p id="soal">Mengambil soal...</p>
+        <input type="text" id="jawaban" placeholder="Ketik jawaban...">
+        <button class="tebak-button" onclick="cekJawaban()">Tebak</button>
+
+        <!-- Tombol kembali ke Game Menu -->
+        <a href="https://ky-zybotz.vercel.app/game/" class="back-button">⬅️ Kembali ke Game Menu</a>
+    </div>
 </body>
 </html>
