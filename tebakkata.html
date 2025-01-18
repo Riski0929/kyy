@@ -24,15 +24,18 @@
         function cekJawaban() {
             let jawabanUser = document.getElementById("jawaban").value.trim().toUpperCase(); // Hilangkan spasi
             if (jawabanUser === soalSekarang.jawaban) {
-                alert("Kamu menang! Jawaban benar: " + soalSekarang.jawaban);
-                location.reload();
+                document.getElementById("message").innerText = "Selamat, Kamu Menang! Jawaban benar: " + soalSekarang.jawaban;
+                document.getElementById("message").style.color = "green";
+                setTimeout(() => location.reload(), 2000); // Reload halaman setelah 2 detik
             } else {
                 kesempatan--;
                 if (kesempatan === 0) {
-                    alert("Game Over! Jawaban yang benar: " + soalSekarang.jawaban);
-                    location.reload();
+                    document.getElementById("message").innerText = "Game Over! Jawaban yang benar: " + soalSekarang.jawaban;
+                    document.getElementById("message").style.color = "red";
+                    setTimeout(() => location.reload(), 2000); // Reload halaman setelah 2 detik
                 } else {
-                    alert("Jawaban salah! Kesempatan tersisa: " + kesempatan);
+                    document.getElementById("message").innerText = "Jawaban salah! Kesempatan tersisa: " + kesempatan;
+                    document.getElementById("message").style.color = "orange";
                 }
             }
             document.getElementById("jawaban").value = "";
@@ -150,20 +153,10 @@
             cursor: not-allowed;
         }
 
-        .back-button {
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-            padding: 10px;
-            width: 100%;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .back-button:hover {
-            background-color: #5a6268;
+        .message {
+            font-size: 20px;
+            margin-top: 20px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -176,8 +169,8 @@
         <button class="tebak-button" onclick="cekJawaban()">Tebak</button>
         <button class="clue-button" id="clueButton" onclick="tampilkanClue()">🔍 Lihat Clue</button>
 
-        <!-- Tombol kembali ke Game Menu -->
-        <a href="https://your-website-link.com/game/" class="back-button">⬅️ Kembali ke Game Menu</a>
+        <!-- Pesan -->
+        <p id="message" class="message"></p>
     </div>
 </body>
 </html>
