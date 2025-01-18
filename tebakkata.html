@@ -37,6 +37,31 @@
             document.getElementById("jawaban").value = "";
         }
 
+        function tampilkanClue() {
+            if (!soalSekarang) return;
+            let jawaban = soalSekarang.jawaban;
+            let clueArray = jawaban.split("");
+
+            // Tentukan jumlah huruf yang akan ditampilkan (sekitar 40-50%)
+            let jumlahTerbuka = Math.ceil(jawaban.length * 0.4);
+
+            // Pilih index huruf yang akan ditampilkan secara acak
+            let indexTerbuka = new Set();
+            while (indexTerbuka.size < jumlahTerbuka) {
+                let randIndex = Math.floor(Math.random() * jawaban.length);
+                indexTerbuka.add(randIndex);
+            }
+
+            // Ubah huruf lainnya jadi "*"
+            for (let i = 0; i < clueArray.length; i++) {
+                if (!indexTerbuka.has(i)) {
+                    clueArray[i] = "*";
+                }
+            }
+
+            document.getElementById("clue").innerText = "Clue: " + clueArray.join("");
+        }
+
         window.onload = function() {
             ambilSoal();
             efekSalju(); // Menjalankan efek salju
@@ -71,6 +96,13 @@
             margin-bottom: 20px;
         }
 
+        p#clue {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+
         input {
             padding: 10px;
             font-size: 16px;
@@ -100,6 +132,15 @@
             background-color: #0073a7;
         }
 
+        .clue-button {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .clue-button:hover {
+            background-color: #e67e22;
+        }
+
         .back-button {
             background-color: #6c757d;
             color: white;
@@ -121,8 +162,10 @@
     <div class="container">
         <h1>🔤 Tebak Kata</h1>
         <p id="soal">Mengambil soal...</p>
+        <p id="clue">Clue: ???</p>
         <input type="text" id="jawaban" placeholder="Ketik jawaban...">
         <button class="tebak-button" onclick="cekJawaban()">Tebak</button>
+        <button class="clue-button" onclick="tampilkanClue()">🔍 Lihat Clue</button>
 
         <!-- Tombol kembali ke Game Menu -->
         <a href="https://ky-zybotz.vercel.app/game/" class="back-button">⬅️ Kembali ke Game Menu</a>
