@@ -7,6 +7,7 @@
     <script>
         let soalSekarang = null;
         let kesempatan = 3;
+        let clueSudahDiberikan = false; // Menandakan apakah clue sudah diberikan
 
         async function ambilSoal() {
             try {
@@ -21,9 +22,9 @@
         }
 
         function cekJawaban() {
-            let jawabanUser = document.getElementById("jawaban").value.toUpperCase();
+            let jawabanUser = document.getElementById("jawaban").value.trim().toUpperCase(); // Hilangkan spasi
             if (jawabanUser === soalSekarang.jawaban) {
-                alert("Selamat! Jawaban benar: " + soalSekarang.jawaban);
+                alert("Kamu menang! Jawaban benar: " + soalSekarang.jawaban);
                 location.reload();
             } else {
                 kesempatan--;
@@ -38,6 +39,7 @@
         }
 
         function tampilkanClue() {
+            if (clueSudahDiberikan) return; // Mencegah pemberian clue lebih dari sekali
             if (!soalSekarang) return;
             let jawaban = soalSekarang.jawaban;
             let clueArray = jawaban.split("");
@@ -60,6 +62,8 @@
             }
 
             document.getElementById("clue").innerText = "Clue: " + clueArray.join("");
+            clueSudahDiberikan = true; // Tandai bahwa clue sudah diberikan
+            document.getElementById("clueButton").disabled = true; // Nonaktifkan tombol clue setelah digunakan
         }
 
         window.onload = function() {
@@ -141,6 +145,11 @@
             background-color: #e67e22;
         }
 
+        .clue-button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
         .back-button {
             background-color: #6c757d;
             color: white;
@@ -165,10 +174,10 @@
         <p id="clue">Clue: ???</p>
         <input type="text" id="jawaban" placeholder="Ketik jawaban...">
         <button class="tebak-button" onclick="cekJawaban()">Tebak</button>
-        <button class="clue-button" onclick="tampilkanClue()">🔍 Lihat Clue</button>
+        <button class="clue-button" id="clueButton" onclick="tampilkanClue()">🔍 Lihat Clue</button>
 
         <!-- Tombol kembali ke Game Menu -->
-        <a href="https://ky-zybotz.vercel.app/game/" class="back-button">⬅️ Kembali ke Game Menu</a>
+        <a href="https://your-website-link.com/game/" class="back-button">⬅️ Kembali ke Game Menu</a>
     </div>
 </body>
 </html>
