@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tebak Kata</title>
+    <script>
+        let soalSekarang = null;
+        let kesempatan = 3;
+
+        async function ambilSoal() {
+            try {
+                let res = await fetch("https://raw.githubusercontent.com/nazedev/database/refs/heads/master/games/tebakkata.json");
+                let data = await res.json();
+                soalSekarang = data[Math.floor(Math.random() * data.length)];
+                document.getElementById("soal").innerText = soalSekarang.soal;
+            } catch (error) {
+                alert("Gagal mengambil soal!");
+                console.error(error);
+            }
+        }
+
+        function cekJawaban() {
+            let jawabanUser = document.getElementById("jawaban").value.toUpperCase();
+            if (jawabanUser === soalSekarang.jawaban) {
+                alert("Selamat! Jawaban benar: " + soalSekarang.jawaban);
+                location.reload();
+            } else {
+                kesempatan--;
+                if (kesempatan === 0) {
+                    alert("Game Over! Jawaban yang benar: " + soalSekarang.jawaban);
+                    location.reload();
+                } else {
+                    alert("Jawaban salah! Kesempatan tersisa: " + kesempatan);
+                }
+            }
+            document.getElementById("jawaban").value = "";
+        }
+
+        window.onload = ambilSoal;
+    </script>
+</head>
+<body>
+    <h1>Tebak Kata</h1>
+    <p id="soal">Mengambil soal...</p>
+    <input type="text" id="jawaban">
+    <button onclick="cekJawaban()">Tebak</button>
+</body>
+</html>
