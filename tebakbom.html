@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Game Tebak Bom</title>
+  <script src="https://cdn.rawgit.com/bungfrangki/efeksalju/2a7805c7/efek-salju.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,7 +13,11 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-color: #f0f0f0;
+      background-image: url('https://telegra.ph/file/c93081f7c7e739a9bef5f.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: white;
       margin: 0;
     }
 
@@ -26,13 +31,20 @@
     .cell {
       width: 50px;
       height: 50px;
-      background-color: #ddd;
+      background-color: rgba(255, 255, 255, 0.3);
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 20px;
       cursor: pointer;
       border-radius: 5px;
+      color: white;
+      border: 2px solid #fff;
+      transition: background-color 0.3s;
+    }
+
+    .cell:hover {
+      background-color: rgba(255, 255, 255, 0.6);
     }
 
     .score {
@@ -48,6 +60,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
 
     .reset-button:hover {
@@ -181,6 +194,7 @@
 
   // Initialize the game
   resetGame();
+  efekSalju(); // Menambahkan efek salju
 </script>
 
 </body>
