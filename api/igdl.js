@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
       url: $(el).attr('href')
     })).get();
 
-    if (resultArray.length === 0) {
+    if (resultArray.length < 2) {
       return res
         .status(404)
         .setHeader('Content-Type', 'application/json')
@@ -48,18 +48,19 @@ module.exports = async (req, res) => {
         }, null, 2));
     }
 
+    const mediaUrl = resultArray[1].url;
+    const head = await axios.head(mediaUrl);
+    const contentType = head.headers['content-type'] || '';
+
     let type = 'unknown';
     let result = {};
 
-    // Ambil hasil kedua (index 1), bukan pertama (index 0)
-    const secondResult = resultArray[1];
-
-    if (secondResult && /\.mp4($|\?)/i.test(secondResult.url)) {
+    if (contentType.includes('video')) {
       type = 'video';
-      result.video = secondResult.url;
-    } else if (resultArray.length > 1 && /\.(jpe?g|png|webp)($|\?)/i.test(secondResult?.url || '')) {
+      result.video = mediaUrl;
+    } else if (contentType.includes('image')) {
       type = 'image';
-      result.images = resultArray.map(r => r.url);
+      result.images = resultArray.slice(1).map(r => r.url);
     }
 
     return res
