@@ -10,7 +10,7 @@
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f3f6f9;
-      padding: 40px 20px;
+      padding: 40px 10px;
     }
     h2 {
       font-weight: 600;
@@ -32,47 +32,48 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
       padding: 25px;
     }
+    table {
+      min-width: 600px; /* bikin tabel lebar default */
+    }
     footer {
       margin-top: 40px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container-fluid">
     <div class="card">
       <h2 class="text-center">Download API</h2>
-      <div class="table-responsive">
-        <table class="table table-sm table-bordered table-hover align-middle text-center">
-          <thead class="table-light">
-            <tr>
-              <th>No</th>
-              <th>Name</th>
-              <th>Parameter</th>
-              <th>Method</th>
-              <th>Status</th>
-              <th>Try</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Instagram Downloader</td>
-              <td>url</td>
-              <td><span class="badge bg-primary">GET</span></td>
-              <td><span class="badge bg-success">ONLINE</span></td>
-              <td><a href="/api/instagram?url=https://www.instagram.com/p/DIdyW4Ihueh/?igsh=YzljYTk1ODg3Zg==" class="btn btn-sm btn-primary">↗</a></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>TikTok Downloader</td>
-              <td>url</td>
-              <td><span class="badge bg-primary">GET</span></td>
-              <td><span class="badge bg-success">ONLINE</span></td>
-              <td><a href="/api/tiktok?url=https://vt.tiktok.com/ZSr7aw5yE/" class="btn btn-sm btn-primary">↗</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table class="table table-sm table-bordered table-hover align-middle text-center">
+        <thead class="table-light">
+          <tr>
+            <th>No</th>
+            <th>Name</th>
+            <th>Parameter</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Try</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Instagram Downloader</td>
+            <td>url</td>
+            <td><span class="badge bg-primary">GET</span></td>
+            <td><span class="badge bg-success">ONLINE</span></td>
+            <td><a href="/api/instagram?url=https://www.instagram.com/p/DIdyW4Ihueh/?igsh=YzljYTk1ODg3Zg==" class="btn btn-sm btn-primary">↗</a></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>TikTok Downloader</td>
+            <td>url</td>
+            <td><span class="badge bg-primary">GET</span></td>
+            <td><span class="badge bg-success">ONLINE</span></td>
+            <td><a href="/api/tiktok?url=https://vt.tiktok.com/ZSr7aw5yE/" class="btn btn-sm btn-primary">↗</a></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <footer class="text-center text-muted small mt-4">2025 © Zynn API. Crafted by Zynn</footer>
   </div>
