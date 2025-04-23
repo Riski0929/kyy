@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
       status: false,
       creator: 'Kyy',
       code: 406,
-      message: 'Masukan parameter url'
+      message: 'Masukan parameter url. Contoh: https://ky-zybotz.vercel.app/yt?url=https://youtube.com/watch?v=xxxxxxxxxxx&format=720'
     });
   }
 
@@ -24,18 +24,42 @@ module.exports = async (req, res) => {
         message: result.error || 'Terjadi kesalahan saat mengambil video'
       };
 
-      // Tampilkan daftar format jika ada
       if (result.available_fmt) {
         response.available_formats = result.available_fmt;
+        response.example_url = `https://ky-zybotz.vercel.app/yt?url=${encodeURIComponent(url)}&format=${result.available_fmt[0]}`;
       }
 
       return res.status(result.code || 400).json(response);
     }
 
+    const {
+      title,
+      type,
+      format: fmt,
+      quality,
+      duration,
+      thumbnail,
+      download,
+      id,
+      key,
+      downloaded
+    } = result.result;
+
     return res.status(200).json({
       status: true,
       creator: 'Kyy',
-      result: result.result
+      result: {
+        title,
+        type,
+        format: fmt,
+        quality,
+        duration,
+        thumbnail,
+        download_url: download,
+        youtube_id: id,
+        encryption_key: key,
+        downloaded
+      }
     });
   } catch (e) {
     return res.status(500).json({
