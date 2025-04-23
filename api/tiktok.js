@@ -1,4 +1,3 @@
-
 const axios = require('axios');
 
 module.exports = async (req, res) => {
@@ -6,7 +5,6 @@ module.exports = async (req, res) => {
   if (!url) return res.status(400).json({ status: false, message: 'Missing url parameter' });
 
   try {
-    let data = []
     function formatNumber(integer) {
       let numb = parseInt(integer)
       return Number(numb).toLocaleString().replace(/,/g, '.')
@@ -25,8 +23,8 @@ module.exports = async (req, res) => {
       })
     }
 
-    let domain = 'https://www.tikwm.com/api/';
-    let resTik = await (await axios.post(domain, {}, {
+    const domain = 'https://www.tikwm.com/api/';
+    const response = await axios.post(domain, {}, {
       headers: {
         'Accept': 'application/json, text/javascript, */*; q=0.01',
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -38,47 +36,48 @@ module.exports = async (req, res) => {
         url: url,
         hd: 1
       }
-    })).data.data
+    });
 
-    if (resTik && !resTik.size && !resTik.wm_size && !resTik.hd_size) {
-      resTik.images.map(v => data.push({ type: 'photo', url: v }))
-    } else {
-      if (resTik.wmplay) data.push({ type: 'watermark', url: resTik.wmplay })
-      if (resTik.play) data.push({ type: 'nowatermark', url: resTik.play })
-      if (resTik.hdplay) data.push({ type: 'nowatermark_hd', url: resTik.hdplay })
-    }
+    const resTik = response.data.data;
 
     return res.json({
       status: true,
-      title: resTik.title,
-      taken_at: formatDate(resTik.create_time),
-      region: resTik.region,
-      id: resTik.id,
-      duration: resTik.duration + ' Seconds',
-      cover: resTik.cover,
-      data: data,
-      music_info: {
-        id: resTik.music_info.id,
-        title: resTik.music_info.title,
-        author: resTik.music_info.author,
-        album: resTik.music_info.album || null,
-        url: resTik.music || resTik.music_info.play
-      },
-      stats: {
-        views: formatNumber(resTik.play_count),
-        likes: formatNumber(resTik.digg_count),
-        comment: formatNumber(resTik.comment_count),
-        share: formatNumber(resTik.share_count),
-        download: formatNumber(resTik.download_count)
-      },
-      author: {
-        id: resTik.author.id,
-        fullname: resTik.author.unique_id,
-        nickname: resTik.author.nickname,
-        avatar: resTik.author.avatar
+      result: {
+        id: resTik.id,
+        title: resTik.title,
+        region: resTik.region,
+        taken_at: formatDate(resTik.create_time),
+        duration: resTik.duration + ' Seconds',
+        cover: resTik.cover,
+        video: {
+          watermark: resTik.wmplay || null,
+          nowatermark: resTik.play || null,
+          hd: resTik.hdplay || null
+        },
+        music: {
+          id: resTik.music_info.id,
+          title: resTik.music_info.title,
+          author: resTik.music_info.author,
+          album: resTik.music_info.album || null,
+          url: resTik.music || resTik.music_info.play
+        },
+        stats: {
+          views: formatNumber(resTik.play_count),
+          likes: formatNumber(resTik.digg_count),
+          comment: formatNumber(resTik.comment_count),
+          share: formatNumber(resTik.share_count),
+          download: formatNumber(resTik.download_count)
+        },
+        author: {
+          id: resTik.author.id,
+          fullname: resTik.author.unique_id,
+          nickname: resTik.author.nickname,
+          avatar: resTik.author.avatar
+        }
       }
-    })
+    });
+
   } catch (e) {
-    return res.status(500).json({ status: false, message: e.message })
+    return res.status(500).json({ status: false, message: e.message });
   }
-          }
+      }
