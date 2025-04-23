@@ -5,31 +5,38 @@ module.exports = async (req, res) => {
   const { url, format } = req.query;
 
   if (!url) {
-    return res.status(406).json({
+    const errorResponse = {
       status: false,
       creator: 'Kyy',
       code: 406,
       message: 'Masukkan parameter url.\nContoh: https://ky-zybotz.vercel.app/yt?url=https://youtube.com/watch?v=xxxxxxxxxxx&format=720'
-    });
+    };
+    return res
+      .setHeader('Content-Type', 'application/json')
+      .status(406)
+      .send(JSON.stringify(errorResponse, null, 2));
   }
 
   try {
     const result = await savetube.download(url, format);
 
     if (!result.status) {
-      const response = {
+      const errorResponse = {
         status: false,
         creator: 'Kyy',
-        code: result.code,
+        code: result.code || 400,
         message: result.error || 'Terjadi kesalahan saat mengambil video'
       };
 
       if (result.available_fmt) {
-        response.available_formats = result.available_fmt;
-        response.example_url = `https://ky-zybotz.vercel.app/yt?url=${encodeURIComponent(url)}&format=${result.available_fmt[0]}`;
+        errorResponse.available_formats = result.available_fmt;
+        errorResponse.example_url = `https://ky-zybotz.vercel.app/yt?url=${encodeURIComponent(url)}&format=${result.available_fmt[0]}`;
       }
 
-      return res.status(result.code || 400).json(response);
+      return res
+        .setHeader('Content-Type', 'application/json')
+        .status(result.code || 400)
+        .send(JSON.stringify(errorResponse, null, 2));
     }
 
     const {
@@ -45,7 +52,7 @@ module.exports = async (req, res) => {
       downloaded
     } = result.result;
 
-    const responseData = {
+    const successResponse = {
       status: true,
       creator: 'Kyy',
       result: {
@@ -62,12 +69,10 @@ module.exports = async (req, res) => {
       }
     };
 
-    // Pretty print buat manusia
     return res
       .setHeader('Content-Type', 'application/json')
       .status(200)
-      .send(JSON.stringify(responseData, null, 2));
-
+      .send(JSON.stringify(successResponse, null, 2));
   } catch (e) {
     const errorResponse = {
       status: false,
