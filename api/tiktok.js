@@ -5,13 +5,14 @@ module.exports = async (req, res) => {
   if (!url) return res.status(400).json({ status: false, message: 'Missing url parameter' });
 
   try {
+    let data = [];
     function formatNumber(integer) {
-      let numb = parseInt(integer)
-      return Number(numb).toLocaleString().replace(/,/g, '.')
+      let numb = parseInt(integer);
+      return Number(numb).toLocaleString().replace(/,/g, '.');
     }
 
-    function formatDate(n, locale = 'en') {
-      let d = new Date(n * 1000)
+    function formatDate(n, locale = 'id-ID') {
+      let d = new Date(n * 1000);
       return d.toLocaleDateString(locale, {
         weekday: 'long',
         day: 'numeric',
@@ -20,11 +21,11 @@ module.exports = async (req, res) => {
         hour: 'numeric',
         minute: 'numeric',
         second: 'numeric'
-      })
+      });
     }
 
-    const domain = 'https://www.tikwm.com/api/';
-    const response = await axios.post(domain, {}, {
+    let domain = 'https://www.tikwm.com/api/';
+    let resTik = await (await axios.post(domain, {}, {
       headers: {
         'Accept': 'application/json, text/javascript, */*; q=0.01',
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -36,11 +37,19 @@ module.exports = async (req, res) => {
         url: url,
         hd: 1
       }
-    });
+    })).data.data;
 
-    const resTik = response.data.data;
+    if (resTik && !resTik.size && !resTik.wm_size && !resTik.hd_size) {
+      resTik.images.map(v => data.push({ type: 'photo', url: v }));
+    } else {
+      if (resTik.wmplay) data.push({ type: 'watermark', url: resTik.wmplay });
+      if (resTik.play) data.push({ type: 'nowatermark', url: resTik.play });
+      if (resTik.hdplay) data.push({ type: 'nowatermark_hd', url: resTik.hdplay });
+    }
 
-    return res.json({
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    return res.send(JSON.stringify({
       status: true,
       result: {
         id: resTik.id,
@@ -50,11 +59,11 @@ module.exports = async (req, res) => {
         duration: resTik.duration + ' Seconds',
         cover: resTik.cover,
         video: {
-          watermark: resTik.wmplay || null,
-          nowatermark: resTik.play || null,
-          hd: resTik.hdplay || null
+          watermark: resTik.wmplay,
+          nowatermark: resTik.play,
+          nowatermark_hd: resTik.hdplay
         },
-        music: {
+        music_info: {
           id: resTik.music_info.id,
           title: resTik.music_info.title,
           author: resTik.music_info.author,
@@ -75,9 +84,8 @@ module.exports = async (req, res) => {
           avatar: resTik.author.avatar
         }
       }
-    });
-
+    }, null, 2)); // Bikin JSON-nya rapih
   } catch (e) {
     return res.status(500).json({ status: false, message: e.message });
   }
-      }
+};
