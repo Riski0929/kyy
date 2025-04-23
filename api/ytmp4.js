@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
       status: false,
       creator: 'Kyy',
       code: 406,
-      message: 'Masukan parameter url. Contoh: https://ky-zybotz.vercel.app/yt?url=https://youtube.com/watch?v=xxxxxxxxxxx&format=720'
+      message: 'Masukkan parameter url.\nContoh: https://ky-zybotz.vercel.app/yt?url=https://youtube.com/watch?v=xxxxxxxxxxx&format=720'
     });
   }
 
@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
       downloaded
     } = result.result;
 
-    return res.status(200).json({
+    const responseData = {
       status: true,
       creator: 'Kyy',
       result: {
@@ -60,13 +60,25 @@ module.exports = async (req, res) => {
         encryption_key: key,
         downloaded
       }
-    });
+    };
+
+    // Pretty print buat manusia
+    return res
+      .setHeader('Content-Type', 'application/json')
+      .status(200)
+      .send(JSON.stringify(responseData, null, 2));
+
   } catch (e) {
-    return res.status(500).json({
+    const errorResponse = {
       status: false,
       creator: 'Kyy',
       code: 500,
       message: `Terjadi kesalahan: ${e.message}`
-    });
+    };
+
+    return res
+      .setHeader('Content-Type', 'application/json')
+      .status(500)
+      .send(JSON.stringify(errorResponse, null, 2));
   }
 };
