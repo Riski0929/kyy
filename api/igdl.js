@@ -1,5 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const path = require('path');
 
 module.exports = async (req, res) => {
   const { url } = req.query;
@@ -31,13 +32,13 @@ module.exports = async (req, res) => {
       }
     });
 
-    const $ = require('cheerio').load(data.data);
-    let result = $('a.abutton.is-success.is-fullwidth.btn-premium').map((_, el) => ({
+    const $ = cheerio.load(data.data);
+    const resultArray = $('a.abutton.is-success.is-fullwidth.btn-premium').map((_, el) => ({
       title: $(el).attr('title'),
       url: $(el).attr('href')
     })).get();
 
-    if (result.length === 0) {
+    if (resultArray.length === 0) {
       return res
         .status(404)
         .setHeader('Content-Type', 'application/json')
@@ -49,11 +50,26 @@ module.exports = async (req, res) => {
         }, null, 2));
     }
 
+    let result = {};
+    let type = 'unknown';
+    const isVideo = resultArray.length === 1 && path.extname(resultArray[0].url).includes('mp4');
+
+    if (isVideo) {
+      type = 'video';
+      result.video = resultArray[0].url;
+      result.thumbnail = resultArray[0].title || null;
+    } else {
+      type = 'image';
+      result.images = resultArray.map(r => r.url);
+      result.thumbnail = resultArray[0].url;
+    }
+
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
     return res.status(200).send(JSON.stringify({
       status: true,
       creator: 'Kyy',
+      type,
       result
     }, null, 2));
   } catch (e) {
