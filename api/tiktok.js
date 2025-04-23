@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
       .setHeader('Content-Type', 'application/json')
       .send(JSON.stringify({
         status: false,
-        creator: 'BetaBotz',
+        creator: 'Kyy',
         code: 406,
         message: 'masukan parameter url'
       }, null, 2));
@@ -56,7 +56,7 @@ module.exports = async (req, res) => {
         .setHeader('Content-Type', 'application/json')
         .send(JSON.stringify({
           status: false,
-          creator: 'BetaBotz',
+          creator: 'Kyy',
           code: 404,
           message: 'Video tidak ditemukan atau url tidak valid'
         }, null, 2));
@@ -76,7 +76,7 @@ module.exports = async (req, res) => {
       .status(200)
       .send(JSON.stringify({
         status: true,
-        creator: 'BetaBotz',
+        creator: 'Kyy',
         result: {
           id: resTik.id,
           title: resTik.title,
@@ -117,7 +117,7 @@ module.exports = async (req, res) => {
       .setHeader('Content-Type', 'application/json')
       .send(JSON.stringify({
         status: false,
-        creator: 'BetaBotz',
+        creator: 'Kyy',
         code: 500,
         message: `Terjadi kesalahan: ${e.message}`
       }, null, 2));
