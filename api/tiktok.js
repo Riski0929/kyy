@@ -3,12 +3,15 @@ const axios = require('axios');
 module.exports = async (req, res) => {
   const { url } = req.query;
   if (!url) {
-    return res.status(406).json({
-      status: false,
-      creator: 'Kyy',
-      code: 406,
-      message: 'masukan parameter url'
-    });
+    return res
+      .status(406)
+      .setHeader('Content-Type', 'application/json')
+      .send(JSON.stringify({
+        status: false,
+        creator: 'BetaBotz',
+        code: 406,
+        message: 'masukan parameter url'
+      }, null, 2));
   }
 
   try {
@@ -48,12 +51,15 @@ module.exports = async (req, res) => {
 
     const resTik = response.data?.data;
     if (!resTik || Object.keys(resTik).length === 0) {
-      return res.status(404).json({
-        status: false,
-        creator: 'Kyy',
-        code: 404,
-        message: 'Video tidak ditemukan atau url tidak valid'
-      });
+      return res
+        .status(404)
+        .setHeader('Content-Type', 'application/json')
+        .send(JSON.stringify({
+          status: false,
+          creator: 'BetaBotz',
+          code: 404,
+          message: 'Video tidak ditemukan atau url tidak valid'
+        }, null, 2));
     }
 
     if (!resTik.size && !resTik.wm_size && !resTik.hd_size && resTik.images) {
@@ -66,49 +72,54 @@ module.exports = async (req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    return res.status(200).json({
-      status: true,
-      creator: 'Kyy',
-      result: {
-        id: resTik.id,
-        title: resTik.title,
-        region: resTik.region,
-        taken_at: formatDate(resTik.create_time),
-        duration: resTik.duration + ' Seconds',
-        cover: resTik.cover,
-        video: {
-          watermark: resTik.wmplay,
-          nowatermark: resTik.play,
-          nowatermark_hd: resTik.hdplay
-        },
-        music_info: {
-          id: resTik.music_info.id,
-          title: resTik.music_info.title,
-          author: resTik.music_info.author,
-          album: resTik.music_info.album || null,
-          url: resTik.music || resTik.music_info.play
-        },
-        stats: {
-          views: formatNumber(resTik.play_count),
-          likes: formatNumber(resTik.digg_count),
-          comment: formatNumber(resTik.comment_count),
-          share: formatNumber(resTik.share_count),
-          download: formatNumber(resTik.download_count)
-        },
-        author: {
-          id: resTik.author.id,
-          fullname: resTik.author.unique_id,
-          nickname: resTik.author.nickname,
-          avatar: resTik.author.avatar
+    return res
+      .status(200)
+      .send(JSON.stringify({
+        status: true,
+        creator: 'BetaBotz',
+        result: {
+          id: resTik.id,
+          title: resTik.title,
+          region: resTik.region,
+          taken_at: formatDate(resTik.create_time),
+          duration: resTik.duration + ' Seconds',
+          cover: resTik.cover,
+          video: {
+            watermark: resTik.wmplay,
+            nowatermark: resTik.play,
+            nowatermark_hd: resTik.hdplay
+          },
+          music_info: {
+            id: resTik.music_info.id,
+            title: resTik.music_info.title,
+            author: resTik.music_info.author,
+            album: resTik.music_info.album || null,
+            url: resTik.music || resTik.music_info.play
+          },
+          stats: {
+            views: formatNumber(resTik.play_count),
+            likes: formatNumber(resTik.digg_count),
+            comment: formatNumber(resTik.comment_count),
+            share: formatNumber(resTik.share_count),
+            download: formatNumber(resTik.download_count)
+          },
+          author: {
+            id: resTik.author.id,
+            fullname: resTik.author.unique_id,
+            nickname: resTik.author.nickname,
+            avatar: resTik.author.avatar
+          }
         }
-      }
-    });
+      }, null, 2)); // biar tampilannya rapi
   } catch (e) {
-    return res.status(500).json({
-      status: false,
-      creator: 'Kyy',
-      code: 500,
-      message: `Terjadi kesalahan: ${e.message}`
-    });
+    return res
+      .status(500)
+      .setHeader('Content-Type', 'application/json')
+      .send(JSON.stringify({
+        status: false,
+        creator: 'BetaBotz',
+        code: 500,
+        message: `Terjadi kesalahan: ${e.message}`
+      }, null, 2));
   }
 };
