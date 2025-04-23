@@ -15,7 +15,6 @@ module.exports = async (req, res) => {
   }
 
   try {
-    let data = [];
     function formatNumber(integer) {
       let numb = parseInt(integer);
       return Number(numb).toLocaleString().replace(/,/g, '.');
@@ -62,55 +61,57 @@ module.exports = async (req, res) => {
         }, null, 2));
     }
 
+    let type = 'video';
+    let result = {
+      id: resTik.id,
+      title: resTik.title,
+      region: resTik.region,
+      taken_at: formatDate(resTik.create_time),
+      duration: resTik.duration + ' Seconds',
+      cover: resTik.cover,
+      music_info: {
+        id: resTik.music_info.id,
+        title: resTik.music_info.title,
+        author: resTik.music_info.author,
+        album: resTik.music_info.album || null,
+        url: resTik.music || resTik.music_info.play
+      },
+      stats: {
+        views: formatNumber(resTik.play_count),
+        likes: formatNumber(resTik.digg_count),
+        comment: formatNumber(resTik.comment_count),
+        share: formatNumber(resTik.share_count),
+        download: formatNumber(resTik.download_count)
+      },
+      author: {
+        id: resTik.author.id,
+        fullname: resTik.author.unique_id,
+        nickname: resTik.author.nickname,
+        avatar: resTik.author.avatar
+      }
+    };
+
     if (!resTik.size && !resTik.wm_size && !resTik.hd_size && resTik.images) {
-      resTik.images.map(v => data.push({ type: 'photo', url: v }));
+      // Tipe gambar
+      type = 'image';
+      result.images = resTik.images;
     } else {
-      if (resTik.wmplay) data.push({ type: 'watermark', url: resTik.wmplay });
-      if (resTik.play) data.push({ type: 'nowatermark', url: resTik.play });
-      if (resTik.hdplay) data.push({ type: 'nowatermark_hd', url: resTik.hdplay });
+      // Tipe video
+      result.video = {
+        watermark: resTik.wmplay,
+        nowatermark: resTik.play,
+        nowatermark_hd: resTik.hdplay
+      };
     }
 
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    return res
-      .status(200)
-      .send(JSON.stringify({
-        status: true,
-        creator: 'Kyy',
-        result: {
-          id: resTik.id,
-          title: resTik.title,
-          region: resTik.region,
-          taken_at: formatDate(resTik.create_time),
-          duration: resTik.duration + ' Seconds',
-          cover: resTik.cover,
-          video: {
-            watermark: resTik.wmplay,
-            nowatermark: resTik.play,
-            nowatermark_hd: resTik.hdplay
-          },
-          music_info: {
-            id: resTik.music_info.id,
-            title: resTik.music_info.title,
-            author: resTik.music_info.author,
-            album: resTik.music_info.album || null,
-            url: resTik.music || resTik.music_info.play
-          },
-          stats: {
-            views: formatNumber(resTik.play_count),
-            likes: formatNumber(resTik.digg_count),
-            comment: formatNumber(resTik.comment_count),
-            share: formatNumber(resTik.share_count),
-            download: formatNumber(resTik.download_count)
-          },
-          author: {
-            id: resTik.author.id,
-            fullname: resTik.author.unique_id,
-            nickname: resTik.author.nickname,
-            avatar: resTik.author.avatar
-          }
-        }
-      }, null, 2)); // biar tampilannya rapi
+    return res.status(200).send(JSON.stringify({
+      status: true,
+      creator: 'Kyy',
+      type,
+      result
+    }, null, 2));
   } catch (e) {
     return res
       .status(500)
