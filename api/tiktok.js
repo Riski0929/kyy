@@ -67,7 +67,6 @@ module.exports = async (req, res) => {
       title: resTik.title,
       region: resTik.region,
       taken_at: formatDate(resTik.create_time),
-      duration: resTik.duration + ' Seconds',
       cover: resTik.cover,
       music_info: {
         id: resTik.music_info.id,
@@ -92,11 +91,10 @@ module.exports = async (req, res) => {
     };
 
     if (!resTik.size && !resTik.wm_size && !resTik.hd_size && resTik.images) {
-      // Tipe gambar
       type = 'image';
       result.images = resTik.images;
     } else {
-      // Tipe video
+      result.duration = resTik.duration + ' Seconds';
       result.video = {
         watermark: resTik.wmplay,
         nowatermark: resTik.play,
