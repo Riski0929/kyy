@@ -4,15 +4,12 @@ const cheerio = require('cheerio');
 module.exports = async (req, res) => {
   const { url } = req.query;
   if (!url) {
-    return res
-      .status(406)
-      .setHeader('Content-Type', 'application/json')
-      .send(JSON.stringify({
-        status: false,
-        creator: 'Kyy',
-        code: 406,
-        message: 'masukkan parameter url'
-      }, null, 2));
+    return res.status(406).json({
+      status: false,
+      creator: 'Kyy',
+      code: 406,
+      message: 'masukkan parameter url'
+    });
   }
 
   try {
@@ -33,55 +30,45 @@ module.exports = async (req, res) => {
 
     const $ = cheerio.load(data.data);
     const resultArray = $('a.abutton.is-success.is-fullwidth.btn-premium').map((_, el) => ({
-      title: $(el).attr('title') || null,
       url: $(el).attr('href')
     })).get();
 
     if (resultArray.length === 0) {
-      return res
-        .status(404)
-        .setHeader('Content-Type', 'application/json')
-        .send(JSON.stringify({
-          status: false,
-          creator: 'Kyy',
-          code: 404,
-          message: 'Media tidak ditemukan atau url tidak valid'
-        }, null, 2));
+      return res.status(404).json({
+        status: false,
+        creator: 'Kyy',
+        code: 404,
+        message: 'Media tidak ditemukan atau url tidak valid'
+      });
     }
+
+    const head = await axios.head(resultArray[0].url).catch(() => null);
+    const contentType = head?.headers['content-type'] || '';
 
     let type = 'unknown';
     let result = {};
 
-    const isVideo = resultArray.length === 1 && /\.mp4($|\?)/i.test(resultArray[0].url);
-    const isImage = resultArray.length > 1 || resultArray.some(r => /\.(jpe?g|png|webp)($|\?)/i.test(r.url));
-
-    if (isVideo) {
+    if (contentType.startsWith('video')) {
       type = 'video';
-      result.video = resultArray[0].url;
-      result.thumbnail = resultArray[0].title || null;
-    } else if (isImage) {
+      result = resultArray[0].url;
+    } else {
       type = 'image';
-      result.images = resultArray.map(r => r.url);
-      result.thumbnail = resultArray[0]?.url || null;
+      result = resultArray.map(r => r.url);
     }
 
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    return res.status(200).send(JSON.stringify({
+    return res.status(200).json({
       status: true,
       creator: 'Kyy',
       type,
       result
-    }, null, 2));
+    });
+
   } catch (e) {
-    return res
-      .status(500)
-      .setHeader('Content-Type', 'application/json')
-      .send(JSON.stringify({
-        status: false,
-        creator: 'Kyy',
-        code: 500,
-        message: `Terjadi kesalahan: ${e.message}`
-      }, null, 2));
+    return res.status(500).json({
+      status: false,
+      creator: 'Kyy',
+      code: 500,
+      message: `Terjadi kesalahan: ${e.message}`
+    });
   }
 };
