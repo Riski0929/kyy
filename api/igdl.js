@@ -1,6 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const path = require('path');
 
 module.exports = async (req, res) => {
   const { url } = req.query;
@@ -34,7 +33,7 @@ module.exports = async (req, res) => {
 
     const $ = cheerio.load(data.data);
     const resultArray = $('a.abutton.is-success.is-fullwidth.btn-premium').map((_, el) => ({
-      title: $(el).attr('title'),
+      title: $(el).attr('title') || null,
       url: $(el).attr('href')
     })).get();
 
@@ -50,18 +49,20 @@ module.exports = async (req, res) => {
         }, null, 2));
     }
 
-    let result = {};
     let type = 'unknown';
-    const isVideo = resultArray.length === 1 && path.extname(resultArray[0].url).includes('mp4');
+    let result = {};
+
+    const isVideo = resultArray.length === 1 && /\.mp4($|\?)/i.test(resultArray[0].url);
+    const isImage = resultArray.length > 1 || resultArray.some(r => /\.(jpe?g|png|webp)($|\?)/i.test(r.url));
 
     if (isVideo) {
       type = 'video';
       result.video = resultArray[0].url;
       result.thumbnail = resultArray[0].title || null;
-    } else {
+    } else if (isImage) {
       type = 'image';
       result.images = resultArray.map(r => r.url);
-      result.thumbnail = resultArray[0].url;
+      result.thumbnail = resultArray[0]?.url || null;
     }
 
     res.setHeader('Content-Type', 'application/json');
