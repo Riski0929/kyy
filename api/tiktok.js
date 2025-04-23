@@ -2,7 +2,14 @@ const axios = require('axios');
 
 module.exports = async (req, res) => {
   const { url } = req.query;
-  if (!url) return res.status(400).json({ status: false, message: 'Missing url parameter' });
+  if (!url) {
+    return res.status(406).json({
+      status: false,
+      creator: 'Kyy',
+      code: 406,
+      message: 'masukan parameter url'
+    });
+  }
 
   try {
     let data = [];
@@ -24,8 +31,8 @@ module.exports = async (req, res) => {
       });
     }
 
-    let domain = 'https://www.tikwm.com/api/';
-    let resTik = await (await axios.post(domain, {}, {
+    const domain = 'https://www.tikwm.com/api/';
+    const response = await axios.post(domain, {}, {
       headers: {
         'Accept': 'application/json, text/javascript, */*; q=0.01',
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -37,9 +44,19 @@ module.exports = async (req, res) => {
         url: url,
         hd: 1
       }
-    })).data.data;
+    });
 
-    if (resTik && !resTik.size && !resTik.wm_size && !resTik.hd_size) {
+    const resTik = response.data?.data;
+    if (!resTik || Object.keys(resTik).length === 0) {
+      return res.status(404).json({
+        status: false,
+        creator: 'Kyy',
+        code: 404,
+        message: 'Video tidak ditemukan atau url tidak valid'
+      });
+    }
+
+    if (!resTik.size && !resTik.wm_size && !resTik.hd_size && resTik.images) {
       resTik.images.map(v => data.push({ type: 'photo', url: v }));
     } else {
       if (resTik.wmplay) data.push({ type: 'watermark', url: resTik.wmplay });
@@ -49,8 +66,9 @@ module.exports = async (req, res) => {
 
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    return res.send(JSON.stringify({
+    return res.status(200).json({
       status: true,
+      creator: 'Kyy',
       result: {
         id: resTik.id,
         title: resTik.title,
@@ -84,8 +102,13 @@ module.exports = async (req, res) => {
           avatar: resTik.author.avatar
         }
       }
-    }, null, 2)); // Bikin JSON-nya rapih
+    });
   } catch (e) {
-    return res.status(500).json({ status: false, message: e.message });
+    return res.status(500).json({
+      status: false,
+      creator: 'Kyy',
+      code: 500,
+      message: `Terjadi kesalahan: ${e.message}`
+    });
   }
 };
