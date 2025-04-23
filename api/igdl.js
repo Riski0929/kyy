@@ -30,10 +30,11 @@ module.exports = async (req, res) => {
 
     const $ = cheerio.load(data.data);
     const resultArray = $('a.abutton.is-success.is-fullwidth.btn-premium').map((_, el) => ({
+      title: $(el).attr('title') || null,
       url: $(el).attr('href')
     })).get();
 
-    if (resultArray.length === 0) {
+    if (resultArray.length < 2) {
       return res.status(404).json({
         status: false,
         creator: 'Kyy',
@@ -42,20 +43,23 @@ module.exports = async (req, res) => {
       });
     }
 
-    const head = await axios.head(resultArray[0].url).catch(() => null);
-    const contentType = head?.headers['content-type'] || '';
+    const mediaUrl = resultArray[1].url; // ambil hasil kedua
+    const head = await axios.head(mediaUrl);
 
     let type = 'unknown';
     let result = {};
 
-    if (contentType.startsWith('video')) {
+    const contentType = head.headers['content-type'] || '';
+    if (contentType.includes('video')) {
       type = 'video';
-      result = resultArray[0].url;
-    } else {
+      result.video = mediaUrl;
+    } else if (contentType.includes('image')) {
       type = 'image';
-      result = resultArray.map(r => r.url);
+      result.images = resultArray.slice(1).map(r => r.url); // ambil semua kecuali thumbnail
     }
 
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     return res.status(200).json({
       status: true,
       creator: 'Kyy',
