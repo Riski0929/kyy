@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
       status: false,
       creator: 'Kyy',
       code: 406,
-      message: 'Masukkan parameter url.\nContoh: https://ky-zybotz.vercel.app/yt?url=https://youtube.com/watch?v=xxxxxxxxxxx&format=720'
+      message: 'Masukkan parameter url.\nContoh: https://ky-zybotz.vercel.app/ytdl?url=https://youtube.com/watch?v=xxxxxxxxxxx&format=720'
     };
     return res
       .setHeader('Content-Type', 'application/json')
@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
 
       if (result.available_fmt) {
         errorResponse.available_formats = result.available_fmt;
-        errorResponse.example_url = `https://ky-zybotz.vercel.app/yt?url=${encodeURIComponent(url)}&format=${result.available_fmt[0]}`;
+        errorResponse.example_url = `https://ky-zybotz.vercel.app/ytdl?url=${encodeURIComponent(url)}&format=${result.available_fmt[0]}`;
       }
 
       return res
