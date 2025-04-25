@@ -7,6 +7,7 @@ const apikeyList = [
   'AIzaSyC8eiu4jeYWSgW-mTZmnb1Ki6ieWT8YmrE'
 ];
 
+// Fungsi buat ngacak apikey
 function randomApikey() {
   return apikeyList[Math.floor(Math.random() * apikeyList.length)];
 }
@@ -29,20 +30,20 @@ async function geminiAi(query, apikey, options = {}) {
           data: Buffer.from(options.media).toString('base64')
         }
       }] : [])]);
-      const hasil = {};
+      const hasil = {}
       hasil.token = response.usageMetadata;
-      if (response?.promptFeedback?.blockReason === 'OTHER' || response?.candidates?.[0]?.finishReason === 'IMAGE_SAFETY') resolve(hasil);
+      if (response?.promptFeedback?.blockReason === 'OTHER' || response?.candidates?.[0]?.finishReason === 'IMAGE_SAFETY') resolve(hasil)
       for (const part of response.candidates[0].content.parts) {
         if (part.text) {
           hasil.text = part.text;
         }
         if (part.inlineData) {
-          hasil.media = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+  hasil.media = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
         }
       }
-      resolve(hasil);
+      resolve(hasil)
     } catch (e) {
-      reject(e);
+      reject(e)
     }
   });
 }
@@ -63,55 +64,20 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const apikey = randomApikey();
+    const apikey = randomApikey(); // Ambil apikey random
 
     const result = await geminiAi(query, apikey, {
       ...(prompt ? { prompt } : {})
     });
 
-    if (!result.media) {
-      return res
-        .status(500)
-        .setHeader('Content-Type', 'application/json')
-        .send(JSON.stringify({
-          status: false,
-          creator: 'Kyy',
-          code: 500,
-          message: 'Gagal mendapatkan media'
-        }, null, 2));
-    }
-
-    // Bikin response HTML tanpa tombol download, tapi tetap auto download
-    const html = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <title>Generated Image</title>
-      </head>
-      <body style="text-align: center; margin-top: 50px;">
-        <h1>Hasil Gambar</h1>
-        <img src="${result.media}" alt="Generated Image" style="max-width: 90%; height: auto;"/>
-      </body>
-      <script>
-        // Auto download gambar setelah gambar loaded
-        window.onload = () => {
-          const link = document.createElement('a');
-          link.href = "${result.media}";
-          link.download = 'gambar.png';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      </script>
-      </html>
-    `;
-
     return res
       .status(200)
-      .setHeader('Content-Type', 'text/html')
-      .send(html);
-
+      .setHeader('Content-Type', 'application/json')
+      .send(JSON.stringify({
+        status: true,
+        creator: 'Kyy',
+        result
+      }, null, 2));
   } catch (e) {
     return res
       .status(500)
