@@ -7,10 +7,12 @@ const apikeyList = [
   'AIzaSyC8eiu4jeYWSgW-mTZmnb1Ki6ieWT8YmrE'
 ];
 
+// Fungsi buat random apikey
 function randomApikey() {
   return apikeyList[Math.floor(Math.random() * apikeyList.length)];
 }
 
+// Fungsi buat generate dari Gemini
 async function geminiAi(query, apikey, options = {}) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -23,15 +25,24 @@ async function geminiAi(query, apikey, options = {}) {
           responseModalities: ['Text', 'Image']
         }
       });
-      const { response } = await model.generateContent([{ text: query }, ...(options.media ? [{
-        inlineData: {
-          mimeType: options.mime,
-          data: Buffer.from(options.media).toString('base64')
-        }
-      }] : [])]);
+
+      const { response } = await model.generateContent([
+        { text: query },
+        ...(options.media ? [{
+          inlineData: {
+            mimeType: options.mime,
+            data: Buffer.from(options.media).toString('base64')
+          }
+        }] : [])
+      ]);
+
       const hasil = {};
       hasil.token = response.usageMetadata;
-      if (response?.promptFeedback?.blockReason === 'OTHER' || response?.candidates?.[0]?.finishReason === 'IMAGE_SAFETY') resolve(hasil);
+
+      if (response?.promptFeedback?.blockReason === 'OTHER' || response?.candidates?.[0]?.finishReason === 'IMAGE_SAFETY') {
+        resolve(hasil);
+      }
+
       for (const part of response.candidates[0].content.parts) {
         if (part.text) {
           hasil.text = part.text;
@@ -47,8 +58,10 @@ async function geminiAi(query, apikey, options = {}) {
   });
 }
 
+// Main API export
 module.exports = async (req, res) => {
   const { query, prompt } = req.query;
+  const acceptHeader = req.headers.accept || '';
 
   if (!query) {
     return res
@@ -64,7 +77,6 @@ module.exports = async (req, res) => {
 
   try {
     const apikey = randomApikey();
-
     const result = await geminiAi(query, apikey, {
       ...(prompt ? { prompt } : {})
     });
@@ -81,7 +93,19 @@ module.exports = async (req, res) => {
         }, null, 2));
     }
 
-    // Bikin response HTML
+    // Kalau minta JSON (axios), kirim JSON
+    if (acceptHeader.includes('application/json')) {
+      return res
+        .status(200)
+        .setHeader('Content-Type', 'application/json')
+        .send(JSON.stringify({
+          status: true,
+          creator: 'Kyy',
+          result
+        }, null, 2));
+    }
+
+    // Kalau browser, kirim HTML
     const html = `
       <!DOCTYPE html>
       <html lang="en">
@@ -93,19 +117,14 @@ module.exports = async (req, res) => {
         <h1>Hasil Gambar</h1>
         <img src="${result.media}" alt="Generated Image" style="max-width: 90%; height: auto;"/>
         <br/><br/>
-        <a href="${result.media}" download="gambar.png">
+        <a id="downloadLink" href="${result.media}" download="gambar.png">
           <button style="padding: 10px 20px; font-size: 16px;">Download Gambar</button>
         </a>
 
         <script>
-          // Auto download gambar setelah gambar loaded
           window.onload = () => {
-            const link = document.createElement('a');
-            link.href = "${result.media}";
-            link.download = 'gambar.png';
-            document.body.appendChild(link);
+            const link = document.getElementById('downloadLink');
             link.click();
-            document.body.removeChild(link);
           }
         </script>
       </body>
