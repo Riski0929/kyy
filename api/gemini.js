@@ -38,7 +38,7 @@ async function geminiAi(query, apikey, options = {}) {
           hasil.text = part.text;
         }
         if (part.inlineData) {
-          hasil.media = Buffer.from(part.inlineData.data, 'base64');
+  hasil.media = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
         }
       }
       resolve(hasil)
