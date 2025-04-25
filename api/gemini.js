@@ -93,8 +93,8 @@ module.exports = async (req, res) => {
         }, null, 2));
     }
 
-    // Kalau minta JSON (axios), kirim JSON
-    if (acceptHeader.includes('application/json')) {
+    // Kalau bukan browser (axios, fetch, bot) => kirim JSON
+    if (!acceptHeader.includes('text/html')) {
       return res
         .status(200)
         .setHeader('Content-Type', 'application/json')
@@ -105,7 +105,7 @@ module.exports = async (req, res) => {
         }, null, 2));
     }
 
-    // Kalau browser, kirim HTML
+    // Kalau browser => kirim HTML
     const html = `
       <!DOCTYPE html>
       <html lang="en">
@@ -120,13 +120,6 @@ module.exports = async (req, res) => {
         <a id="downloadLink" href="${result.media}" download="gambar.png">
           <button style="padding: 10px 20px; font-size: 16px;">Download Gambar</button>
         </a>
-
-        <script>
-          window.onload = () => {
-            const link = document.getElementById('downloadLink');
-            link.click();
-          }
-        </script>
       </body>
       </html>
     `;
