@@ -7,12 +7,11 @@ const apikeyList = [
   'AIzaSyC8eiu4jeYWSgW-mTZmnb1Ki6ieWT8YmrE'
 ];
 
-// Fungsi buat random apikey
+// Fungsi buat ngacak apikey
 function randomApikey() {
   return apikeyList[Math.floor(Math.random() * apikeyList.length)];
 }
 
-// Fungsi buat generate dari Gemini
 async function geminiAi(query, apikey, options = {}) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -25,43 +24,32 @@ async function geminiAi(query, apikey, options = {}) {
           responseModalities: ['Text', 'Image']
         }
       });
-
-      const { response } = await model.generateContent([
-        { text: query },
-        ...(options.media ? [{
-          inlineData: {
-            mimeType: options.mime,
-            data: Buffer.from(options.media).toString('base64')
-          }
-        }] : [])
-      ]);
-
-      const hasil = {};
+      const { response } = await model.generateContent([{ text: query }, ...(options.media ? [{
+        inlineData: {
+          mimeType: options.mime,
+          data: Buffer.from(options.media).toString('base64')
+        }
+      }] : [])]);
+      const hasil = {}
       hasil.token = response.usageMetadata;
-
-      if (response?.promptFeedback?.blockReason === 'OTHER' || response?.candidates?.[0]?.finishReason === 'IMAGE_SAFETY') {
-        resolve(hasil);
-      }
-
+      if (response?.promptFeedback?.blockReason === 'OTHER' || response?.candidates?.[0]?.finishReason === 'IMAGE_SAFETY') resolve(hasil)
       for (const part of response.candidates[0].content.parts) {
         if (part.text) {
           hasil.text = part.text;
         }
         if (part.inlineData) {
-          hasil.media = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+  hasil.media = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
         }
       }
-      resolve(hasil);
+      resolve(hasil)
     } catch (e) {
-      reject(e);
+      reject(e)
     }
   });
 }
 
-// Main API export
 module.exports = async (req, res) => {
   const { query, prompt } = req.query;
-  const acceptHeader = req.headers.accept || '';
 
   if (!query) {
     return res
@@ -76,59 +64,20 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const apikey = randomApikey();
+    const apikey = randomApikey(); // Ambil apikey random
+
     const result = await geminiAi(query, apikey, {
       ...(prompt ? { prompt } : {})
     });
 
-    if (!result.media) {
-      return res
-        .status(500)
-        .setHeader('Content-Type', 'application/json')
-        .send(JSON.stringify({
-          status: false,
-          creator: 'Kyy',
-          code: 500,
-          message: 'Gagal mendapatkan media'
-        }, null, 2));
-    }
-
-    // Kalau bukan browser (axios, fetch, bot) => kirim JSON
-    if (!acceptHeader.includes('text/html')) {
-      return res
-        .status(200)
-        .setHeader('Content-Type', 'application/json')
-        .send(JSON.stringify({
-          status: true,
-          creator: 'Kyy',
-          result
-        }, null, 2));
-    }
-
-    // Kalau browser => kirim HTML
-    const html = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <title>Generated Image</title>
-      </head>
-      <body style="text-align: center; margin-top: 50px;">
-        <h1>Hasil Gambar</h1>
-        <img src="${result.media}" alt="Generated Image" style="max-width: 90%; height: auto;"/>
-        <br/><br/>
-        <a id="downloadLink" href="${result.media}" download="gambar.png">
-          <button style="padding: 10px 20px; font-size: 16px;">Download Gambar</button>
-        </a>
-      </body>
-      </html>
-    `;
-
     return res
       .status(200)
-      .setHeader('Content-Type', 'text/html')
-      .send(html);
-
+      .setHeader('Content-Type', 'application/json')
+      .send(JSON.stringify({
+        status: true,
+        creator: 'Kyy',
+        result
+      }, null, 2));
   } catch (e) {
     return res
       .status(500)
