@@ -1,4 +1,6 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const axios = require('axios');
+const FormData = require('form-data');
 
 // List apikeys disini
 const apikeyList = [
@@ -12,10 +14,25 @@ function randomApikey() {
   return apikeyList[Math.floor(Math.random() * apikeyList.length)];
 }
 
+// Upload ke catbox.moe
+async function uploadToCatbox(buffer, filename = 'image.png') {
+  const form = new FormData();
+  form.append('reqtype', 'fileupload');
+  form.append('fileToUpload', buffer, filename);
+
+  const res = await axios.post('https://catbox.moe/user/api.php', form, {
+    headers: form.getHeaders()
+  });
+
+  return res.data;
+}
+
+// Fungsi utama Gemini
 async function geminiAi(query, apikey, options = {}) {
   return new Promise(async (resolve, reject) => {
     try {
       if (!apikey) reject({ status: 401, error: 'Unauthorized' });
+
       const gemini = new GoogleGenerativeAI(apikey);
       const model = gemini.getGenerativeModel({
         ...(options.prompt ? { systemInstruction: options.prompt } : {}),
@@ -24,30 +41,42 @@ async function geminiAi(query, apikey, options = {}) {
           responseModalities: ['Text', 'Image']
         }
       });
-      const { response } = await model.generateContent([{ text: query }, ...(options.media ? [{
-        inlineData: {
-          mimeType: options.mime,
-          data: Buffer.from(options.media).toString('base64')
-        }
-      }] : [])]);
-      const hasil = {}
-      hasil.token = response.usageMetadata;
-      if (response?.promptFeedback?.blockReason === 'OTHER' || response?.candidates?.[0]?.finishReason === 'IMAGE_SAFETY') resolve(hasil)
+
+      const { response } = await model.generateContent([
+        { text: query },
+        ...(options.media ? [{
+          inlineData: {
+            mimeType: options.mime,
+            data: Buffer.from(options.media).toString('base64')
+          }
+        }] : [])
+      ]);
+
+      const hasil = {};
+
+      if (
+        response?.promptFeedback?.blockReason === 'OTHER' ||
+        response?.candidates?.[0]?.finishReason === 'IMAGE_SAFETY'
+      ) return resolve(hasil);
+
       for (const part of response.candidates[0].content.parts) {
-        if (part.text) {
-          hasil.text = part.text;
-        }
+        if (part.text) hasil.message = part.text;
+
         if (part.inlineData) {
-  hasil.media = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+          const buffer = Buffer.from(part.inlineData.data, 'base64');
+          const uploaded = await uploadToCatbox(buffer, 'gemini.png');
+          hasil.media = uploaded;
         }
       }
-      resolve(hasil)
+
+      resolve(hasil);
     } catch (e) {
-      reject(e)
+      reject(e);
     }
   });
 }
 
+// Handler API
 module.exports = async (req, res) => {
   const { query, prompt } = req.query;
 
@@ -64,7 +93,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const apikey = randomApikey(); // Ambil apikey random
+    const apikey = randomApikey();
 
     const result = await geminiAi(query, apikey, {
       ...(prompt ? { prompt } : {})
