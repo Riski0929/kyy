@@ -64,7 +64,8 @@ async function geminiAi(query, apikey, options = {}) {
 
         if (part.inlineData) {
           const buffer = Buffer.from(part.inlineData.data, 'base64');
-          const uploaded = await uploadToCatbox(buffer, 'gemini.png');
+          const uniqueFilename = `gemini_${Date.now()}_${Math.floor(Math.random() * 1000)}.png`;
+          const uploaded = await uploadToCatbox(buffer, uniqueFilename);
           hasil.media = uploaded;
         }
       }
