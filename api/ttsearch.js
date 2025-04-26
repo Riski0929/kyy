@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
         status: false,
         creator: 'Kyy',
         code: 406,
-        message: 'masukkan parameter query'
+        message: 'Masukkan parameter query'
       }, null, 2));
   }
 
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
       method: "POST",
     });
 
-    if (!data || !data.data || data.data.length === 0) {
+    if (!data || !data.data || data.data.videos.length === 0) {
       return res
         .status(404)
         .setHeader('Content-Type', 'application/json')
@@ -44,13 +44,26 @@ module.exports = async (req, res) => {
         }, null, 2));
     }
 
+    // Rapihin datanya
+    const videos = data.data.videos.map(video => ({
+      video_id: video.video_id,
+      region: video.region,
+      title: video.title,
+      duration: video.duration,
+      cover: `https://tikwm.com${video.cover}`,
+      video_no_watermark: `https://tikwm.com${video.play}`,
+      video_with_watermark: `https://tikwm.com${video.wmplay}`
+    }));
+
     return res
       .status(200)
       .setHeader('Content-Type', 'application/json')
       .send(JSON.stringify({
         status: true,
         creator: 'Kyy',
-        result: data.data
+        result: {
+          videos
+        }
       }, null, 2));
 
   } catch (e) {
