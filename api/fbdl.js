@@ -5,111 +5,71 @@ module.exports = async (req, res) => {
   const { url } = req.query;
 
   if (!url) {
-    return res
-      .status(406)
-      .setHeader('Content-Type', 'application/json')
-      .send(JSON.stringify({
-        status: false,
-        creator: 'Kyy',
-        code: 406,
-        message: 'Masukkan parameter url'
-      }, null, 2));
+    return res.status(406).json({
+      status: false,
+      creator: 'Kyy',
+      code: 406,
+      message: 'Masukkan parameter url'
+    });
   }
 
   try {
-    const { data } = await axios.post(
-      'https://yt1s.io/api/ajaxSearch',
-      new URLSearchParams({
-        q: url,
-        w: '',
-        p: 'home',
-        lang: 'en'
-      }),
-      {
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'Origin': 'https://yt1s.io',
-          'Referer': 'https://yt1s.io/',
-          'User-Agent': 'Postify/1.0.0'
-        }
+    // Request ke website downloader
+    const { data } = await axios.get(`https://snapsave.app/id/facebook-downloader`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
       }
-    );
+    });
 
-    const $ = cheerio.load(data.data);
+    const $ = cheerio.load(data);
 
-    // Ambil semua tombol download
-    const downloads = $('a.abutton.is-success.is-fullwidth.btn-premium')
-      .map((_, el) => ({
-        url: $(el).attr('href'),
-        quality: $(el).attr('data-quality') || null,
-        format: $(el).attr('data-format') || null
-      }))
-      .get();
-
-    if (downloads.length === 0) {
-      return res
-        .status(404)
-        .setHeader('Content-Type', 'application/json')
-        .send(JSON.stringify({
-          status: false,
-          creator: 'Kyy',
-          code: 404,
-          message: 'Media tidak ditemukan atau URL tidak valid'
-        }, null, 2));
-    }
-
-    let result = [];
+    // Cari thumbnail
+    const thumbnail = $('meta[property="og:image"]').attr('content') || null;
     
-    for (let file of downloads) {
-      try {
-        const head = await axios.head(file.url);
-        const contentType = head.headers['content-type'] || '';
+    // Cari title
+    const title = $('meta[property="og:title"]').attr('content') || 'Facebook Video';
 
-        result.push({
-          url: file.url,
-          quality: file.quality,
-          format: file.format,
-          type: contentType.includes('video') ? 'video' :
-                contentType.includes('image') ? 'image' :
-                contentType.includes('audio') ? 'audio' : 'unknown'
-        });
-      } catch (e) {
-        console.warn(`Gagal ambil HEAD: ${file.url}`);
-      }
-    }
+    // Cari duration (kalau ada)
+    const duration = $('meta[property="og:video:duration"]').attr('content');
+    const durasi = duration ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}` : null;
 
-    if (result.length === 0) {
-      return res
-        .status(404)
-        .setHeader('Content-Type', 'application/json')
-        .send(JSON.stringify({
-          status: false,
-          creator: 'Kyy',
-          code: 404,
-          message: 'Tidak ada media valid ditemukan'
-        }, null, 2));
-    }
+    // Cari link download di tombol download
+    const download = {};
 
-    return res
-      .status(200)
-      .setHeader('Content-Type', 'application/json')
-      .send(JSON.stringify({
-        status: true,
-        creator: 'Kyy',
-        code: 200,
-        result
-      }, null, 2));
+    $('a.download-link-fb').each((_, el) => {
+      const quality = $(el).closest('tr').find('td.video-quality').text().trim();
+      const link = $(el).attr('href');
+      if (quality.includes('720')) download['720p'] = link;
+      if (quality.includes('360')) download['360p'] = link;
+    });
 
-  } catch (e) {
-    return res
-      .status(500)
-      .setHeader('Content-Type', 'application/json')
-      .send(JSON.stringify({
+    if (!download['360p'] && !download['720p']) {
+      return res.status(404).json({
         status: false,
         creator: 'Kyy',
-        code: 500,
-        message: `Terjadi kesalahan: ${e.message}`
-      }, null, 2));
+        code: 404,
+        message: 'Link download tidak ditemukan'
+      });
+    }
+
+    return res.status(200).json({
+      status: true,
+      creator: 'Kyy',
+      code: 200,
+      result: {
+        title,
+        duration: durasi || 'Unknown',
+        thumbnail,
+        download
+      }
+    });
+
+  } catch (e) {
+    return res.status(500).json({
+      status: false,
+      creator: 'Kyy',
+      code: 500,
+      message: `Terjadi kesalahan: ${e.message}`
+    });
   }
 };
