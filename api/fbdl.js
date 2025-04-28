@@ -1,75 +1,91 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+async function FacebookDl(url) {
+  try {
+    const { data } = await axios.post(
+      'https://yt1s.io/api/ajaxSearch',
+      new URLSearchParams({ q: url, w: '', p: 'home', lang: 'en' }),
+      {
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'Origin': 'https://yt1s.io',
+          'Referer': 'https://yt1s.io/',
+          'User-Agent': 'Postify/1.0.0'
+        }
+      }
+    );
+
+    const $ = cheerio.load(data.data);
+    const result = {
+      download: []
+    };
+
+    $('a.button.is-success.is-small.download-link-fb').each((index, el) => {
+      const quality = $(el).attr('title') || `quality${index + 1}`;
+      const url = $(el).attr('href') || null;
+
+      if (url) {
+        result.download.push({ quality, url });
+      }
+    });
+
+    return result;
+  } catch (e) {
+    throw e;
+  }
+}
+
 module.exports = async (req, res) => {
   const { url } = req.query;
 
   if (!url) {
-    return res.status(406).json({
-      status: false,
-      creator: 'Kyy',
-      code: 406,
-      message: 'Masukkan parameter url'
-    });
+    return res
+      .status(406)
+      .setHeader('Content-Type', 'application/json')
+      .send(JSON.stringify({
+        status: false,
+        creator: 'Kyy',
+        code: 406,
+        message: 'Masukkan parameter url'
+      }, null, 2));
   }
 
   try {
-    // Request ke website downloader
-    const { data } = await axios.get(`https://snapsave.app/id/facebook-downloader`, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-      }
-    });
+    const result = await FacebookDl(url);
 
-    const $ = cheerio.load(data);
-
-    // Cari thumbnail
-    const thumbnail = $('meta[property="og:image"]').attr('content') || null;
-    
-    // Cari title
-    const title = $('meta[property="og:title"]').attr('content') || 'Facebook Video';
-
-    // Cari duration (kalau ada)
-    const duration = $('meta[property="og:video:duration"]').attr('content');
-    const durasi = duration ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, '0')}` : null;
-
-    // Cari link download di tombol download
-    const download = {};
-
-    $('a.download-link-fb').each((_, el) => {
-      const quality = $(el).closest('tr').find('td.video-quality').text().trim();
-      const link = $(el).attr('href');
-      if (quality.includes('720')) download['720p'] = link;
-      if (quality.includes('360')) download['360p'] = link;
-    });
-
-    if (!download['360p'] && !download['720p']) {
-      return res.status(404).json({
-        status: false,
-        creator: 'Kyy',
-        code: 404,
-        message: 'Link download tidak ditemukan'
-      });
+    if (result.download.length === 0) {
+      return res
+        .status(404)
+        .setHeader('Content-Type', 'application/json')
+        .send(JSON.stringify({
+          status: false,
+          creator: 'Kyy',
+          code: 404,
+          message: 'Media tidak ditemukan atau url tidak valid'
+        }, null, 2));
     }
 
-    return res.status(200).json({
-      status: true,
-      creator: 'Kyy',
-      code: 200,
-      result: {
-        title,
-        duration: durasi || 'Unknown',
-        thumbnail,
-        download
-      }
-    });
+    return res
+      .status(200)
+      .setHeader('Content-Type', 'application/json')
+      .send(JSON.stringify({
+        status: true,
+        creator: 'Kyy',
+        code: 200,
+        result: result
+      }, null, 2));
 
   } catch (e) {
-    return res.status(500).json({
-      status: false,
-      creator: 'Kyy',
-      code: 500,
-      message: `Terjadi kesalahan: ${e.message}`
-    });
+    return res
+      .status(500)
+      .setHeader('Content-Type', 'application/json')
+      .send(JSON.stringify({
+        status: false,
+        creator: 'Kyy',
+        code: 500,
+        message: `Terjadi kesalahan: ${e.message}`
+      }, null, 2));
   }
 };
