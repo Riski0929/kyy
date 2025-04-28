@@ -1,3 +1,5 @@
+const axios = require('axios');
+
 module.exports = async (req, res) => {
   const { query } = req.query;
 
@@ -10,25 +12,23 @@ module.exports = async (req, res) => {
       });
   }
 
-  const texts = query.split(' ');
+  try {
+    const response = await axios({
+      method: 'GET',
+      url: `https://brat.caliphdev.com/api/brat`,
+      params: { text: query },
+      responseType: 'arraybuffer' // penting, biar bisa dapet binary image
+    });
 
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500">
-      <rect width="100%" height="100%" fill="white"/>
-      <style>
-        .text { 
-          font: bold 40px sans-serif; 
-          fill: black; 
-          dominant-baseline: middle; 
-          text-anchor: middle; 
-        }
-      </style>
-      ${texts.map((text, i) => `
-        <text x="50%" y="${150 + i * 50}" class="text">${text}</text>
-      `).join('')}
-    </svg>
-  `;
+    res.setHeader('Content-Type', 'image/png');
+    res.send(response.data);
 
-  res.setHeader('Content-Type', 'image/svg+xml');
-  res.status(200).send(svg);
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        status: false,
+        message: error.message || 'Terjadi kesalahan'
+      });
+  }
 };
