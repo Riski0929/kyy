@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zynn API | Premium API Services</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #8b5cf6;
+      --primary-dark: #7c3aed;
+      --primary-light: #c4b5fd;
+      --secondary: #10b981;
+      --accent: #ec4899;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #94a3b8;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(255, 255, 255, 0.3);
+      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+      font-family: 'Inter', sans-serif;
+      color: var(--light);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      background-attachment: fixed;
+      background-size: 200% 200%;
+      animation: gradient 15s ease infinite;
+    }
+    
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    
+    .header h1 {
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, var(--primary-light), white);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      letter-spacing: -0.5px;
+    }
+    
+    .header p {
+      color: var(--primary-light);
+      font-size: 1.15rem;
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+    
+    .header::after {
+      content: '';
+      display: block;
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      margin: 1.75rem auto;
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+    
+    .main-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+      transition: var(--transition);
+      padding: 2.5rem;
+    }
+    
+    .api-section {
+      margin-bottom: 3rem;
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1.25rem;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 4px 20px -5px rgba(139, 92, 246, 0.4);
+    }
+    
+    .section-title {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: white;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+    
+    .api-card {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    
+    .api-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .api-card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.4);
+    }
+    
+    .api-name {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: white;
+      margin: 0;
+      display: flex;
+      align-items: center;
+    }
+    
+    .api-name .badge {
+      margin-left: 0.75rem;
+      font-weight: 600;
+      font-size: 0.7rem;
+      letter-spacing: 0.5px;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+    }
+    
+    .badge-popular {
+      background: linear-gradient(135deg, var(--accent), #f43f5e);
+      color: white;
+    }
+    
+    .badge-new {
+      background: linear-gradient(135deg, var(--secondary), #06b6d4);
+      color: white;
+    }
+    
+    .api-card-body {
+      padding: 1.75rem;
+    }
+    
+    .api-meta {
+      display: flex;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+    }
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+    
+    .meta-item .label {
+      color: var(--primary-light);
+      margin-right: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .meta-item .value {
+      color: white;
+      font-weight: 500;
+    }
+    
+    .method-badge {
+      padding: 0.35rem 0.85rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .method-get {
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--primary-light);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    
+    .status-badge {
+      padding: 0.35rem 0.85rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .status-online {
+      background: rgba(16, 185, 129, 0.15);
+      color: #a7f3d0;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    
+    .status-online::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--secondary);
+      margin-right: 0.5rem;
+      animation: pulse 2s infinite;
+      box-shadow: 0 0 8px var(--secondary);
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    
+    .api-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
+    
+    .btn-try {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.65rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px -3px rgba(139, 92, 246, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-try:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.5);
+      color: white;
+    }
+    
+    .btn-try::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to bottom right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      transition: var(--transition);
+    }
+    
+    .btn-try:hover::after {
+      left: 100%;
+    }
+    
+    .btn-try i {
+      margin-right: 0.65rem;
+      font-size: 1.1rem;
+    }
+    
+    .parameter {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: white;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 5rem;
+      color: var(--gray);
+      font-size: 0.95rem;
+      position: relative;
+    }
+    
+    .footer::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      margin-bottom: 2rem;
+    }
+    
+    .footer a {
+      color: var(--primary-light);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    .footer a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--primary-light);
+      transition: var(--transition);
+    }
+    
+    .footer a:hover {
+      color: white;
+    }
+    
+    .footer a:hover::after {
+      width: 100%;
+    }
+    
+    .heart {
+      color: #f43f5e;
+      display: inline-block;
+      animation: heartbeat 1.5s infinite;
+      margin: 0 0.25rem;
+    }
+    
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.2); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Floating particles background */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50%;
+      filter: blur(1px);
+      animation: float linear infinite;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0) translateX(0); opacity: 1; }
+      100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1.5rem 1rem;
+        animation: none;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      }
+      
+      .main-card {
+        padding: 1.75rem;
+      }
+      
+      .header h1 {
+        font-size: 2.2rem;
+      }
+      
+      .header p {
+        font-size: 1rem;
+      }
+      
+      .api-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      
+      .api-meta {
+        gap: 1rem;
+      }
+      
+      .section-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Floating particles background -->
+  <div class="particles" id="particles"></div>
+  
+  <div class="dashboard-container">
+    <div class="header">
+      <h1>Zynn API</h1>
+      <p>Premium API services for developers and businesses. Powerful, reliable, and easy to integrate.</p>
+    </div>
+    
+    <div class="main-card">
+      <div class="api-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="bi bi-download"></i>
+          </div>
+          <h3 class="section-title">Download Services</h3>
+        </div>
+        
+        <div class="api-card">
+          <div class="api-card-header">
+            <h4 class="api-name">
+              Instagram Downloader
+              <span class="badge badge-popular">POPULAR</span>
+            </h4>
+            <span class="method-badge method-get">GET</span>
+          </div>
+          <div class="api-card-body">
+            <div class="api-meta">
+              <div class="meta-item">
+                <span class="label">Endpoint:</span>
+                <span class="value">/api/igdl</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Parameter:</span>
+                <span class="parameter">url</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Status:</span>
+                <span class="status-badge status-online">ONLINE</span>
+              </div>
+            </div>
+            <div class="api-actions">
+              <a href="/api/igdl?url=https://www.instagram.com/reel/DIdV8aGPFwS/?igsh=YzljYTk1ODg3Zg==" target="_blank" class="btn btn-try">
+                <i class="bi bi-lightning-charge-fill"></i> Try API
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="api-card">
+          <div class="api-card-header">
+            <h4 class="api-name">TikTok Downloader</h4>
+            <span class="method-badge method-get">GET</span>
+          </div>
+          <div class="api-card-body">
+            <div class="api-meta">
+              <div class="meta-item">
+                <span class="label">Endpoint:</span>
+                <span class="value">/api/tiktok</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Parameter:</span>
+                <span class="parameter">url</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Status:</span>
+                <span class="status-badge status-online">ONLINE</span>
+              </div>
+            </div>
+            <div class="api-actions">
+              <a href="/api/tiktok?url=https://vt.tiktok.com/ZSr7aw5yE/" target="_blank" class="btn btn-try">
+                <i class="bi bi-lightning-charge-fill"></i> Try API
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="api-card">
+          <div class="api-card-header">
+            <h4 class="api-name">YouTube Downloader</h4>
+            <span class="method-badge method-get">GET</span>
+          </div>
+          <div class="api-card-body">
+            <div class="api-meta">
+              <div class="meta-item">
+                <span class="label">Endpoint:</span>
+                <span class="value">/api/ytdl</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Parameter:</span>
+                <span class="parameter">url</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Status:</span>
+                <span class="status-badge status-online">ONLINE</span>
+              </div>
+            </div>
+            <div class="api-actions">
+              <a href="/api/ytdl?url=https://youtube.com/shorts/Kdit_tFgZbo?si=wGSChc1SLnfeTVM2" target="_blank" class="btn btn-try">
+                <i class="bi bi-lightning-charge-fill"></i> Try API
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="api-card">
+          <div class="api-card-header">
+            <h4 class="api-name">Spotify Downloader</h4>
+            <span class="method-badge method-get">GET</span>
+          </div>
+          <div class="api-card-body">
+            <div class="api-meta">
+              <div class="meta-item">
+                <span class="label">Endpoint:</span>
+                <span class="value">/api/spotifydl</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Parameter:</span>
+                <span class="parameter">url</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Status:</span>
+                <span class="status-badge status-online">ONLINE</span>
+              </div>
+            </div>
+            <div class="api-actions">
+              <a href="/api/spotifydl?url=https://open.spotify.com/track/5nTtCOCds6I0PHMNtqelas" target="_blank" class="btn btn-try">
+                <i class="bi bi-lightning-charge-fill"></i> Try API
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="api-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="bi bi-search"></i>
+          </div>
+          <h3 class="section-title">Search Services</h3>
+        </div>
+        
+        <div class="api-card">
+          <div class="api-card-header">
+            <h4 class="api-name">Spotify Search</h4>
+            <span class="method-badge method-get">GET</span>
+          </div>
+          <div class="api-card-body">
+            <div class="api-meta">
+              <div class="meta-item">
+                <span class="label">Endpoint:</span>
+                <span class="value">/api/spotifysearch</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Parameter:</span>
+                <span class="parameter">query</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Status:</span>
+                <span class="status-badge status-online">ONLINE</span>
+              </div>
+            </div>
+            <div class="api-actions">
+              <a href="/api/spotifysearch?query=Alan Walker lily" target="_blank" class="btn btn-try">
+                <i class="bi bi-lightning-charge-fill"></i> Try API
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="api-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <i class="bi bi-robot"></i>
+          </div>
+          <h3 class="section-title">AI Services</h3>
+        </div>
+        
+        <div class="api-card">
+          <div class="api-card-header">
+            <h4 class="api-name">
+              Gemini AI
+              <span class="badge badge-new">NEW</span>
+            </h4>
+            <span class="method-badge method-get">GET</span>
+          </div>
+          <div class="api-card-body">
+            <div class="api-meta">
+              <div class="meta-item">
+                <span class="label">Endpoint:</span>
+                <span class="value">/api/gemini</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Parameter:</span>
+                <span class="parameter">query</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Status:</span>
+                <span class="status-badge status-online">ONLINE</span>
+              </div>
+            </div>
+            <div class="api-actions">
+              <a href="/api/gemini?query=Buatkan gambar Naga hitam kecil lucu dengan latar belakang senja" target="_blank" class="btn btn-try">
+                <i class="bi bi-lightning-charge-fill"></i> Try API
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>© 2025 <a href="#">Zynn API</a>. All rights reserved. Crafted with <span class="heart">❤</span> by Zynn Team</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Create floating particles
+    document.addEventListener('DOMContentLoaded', function() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random properties
+        const size = Math.random() * 5 + 2;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100 + 100;
+        const opacity = Math.random() * 0.5 + 0.1;
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * -20;
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}%`;
+        particle.style.top = `${posY}%`;
+        particle.style.opacity = opacity;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `${delay}s`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    });
+  </script>
+</body>
+</html>
